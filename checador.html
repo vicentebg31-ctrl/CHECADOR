@@ -444,19 +444,23 @@ async function cargarDatosEmpleado(){
     const fecha = fechaHoy();
     const empId = sesionActual.id;
 
-    // Registros de hoy — solo del empleado actual
-    const q = query(collection(db,'registros'), where('empId','==',empId), where('fecha','==',fecha), orderBy('timestamp','asc'));
+    // Registros de hoy — solo del empleado actual (sin orderBy para evitar índice compuesto)
+    const q = query(collection(db,'registros'), where('empId','==',empId), where('fecha','==',fecha));
     const snap = await getDocs(q);
     registrosPorEmp[empId] = [];
     snap.forEach(d=> registrosPorEmp[empId].push({ id: d.id, ...d.data() }));
+    // Ordenar por timestamp en el cliente
+    registrosPorEmp[empId].sort((a,b) => a.timestamp - b.timestamp);
 
     // Asistencia de hoy
     const aDoc = await getDoc(doc(db,'asistencia', empId+'_'+fecha));
     asistenciaCache[empId+'_'+fecha] = aDoc.exists() ? aDoc.data().tipo : null;
 
+    console.log('Registros cargados para', empId, ':', registrosPorEmp[empId]);
     setSyncStatus(document.getElementById('emp-sync'), true, 'Sincronizado ✓');
   } catch(e){
-    setSyncStatus(document.getElementById('emp-sync'), false, 'Sin conexión');
+    console.error('Error cargando datos:', e);
+    setSyncStatus(document.getElementById('emp-sync'), false, 'Error: ' + e.message);
   }
 }
 
