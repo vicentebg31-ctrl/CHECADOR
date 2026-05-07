@@ -391,6 +391,7 @@ window.doLogin = async function(){
 
   if(pass === ADMIN_PASS){
     sesionActual = { esAdmin: true };
+    localStorage.setItem('sesion_checador', JSON.stringify(sesionActual));
     showScreen('admin');
     iniciarEscuchaAdmin();
     return;
@@ -403,6 +404,7 @@ window.doLogin = async function(){
     snap.forEach(d=>{ if(d.data().pass === pass) found = { id: d.id, ...d.data() }; });
     if(found){
       sesionActual = { id: found.id, nombre: found.nombre, esAdmin: false };
+      localStorage.setItem('sesion_checador', JSON.stringify(sesionActual));
       document.getElementById('login-pass').value = '';
       mostrarEmpleado();
     } else {
@@ -417,6 +419,7 @@ window.doLogin = async function(){
 window.logout = function(){
   if(unsubAdmin){ unsubAdmin(); unsubAdmin = null; }
   sesionActual = null;
+  localStorage.removeItem('sesion_checador');
   showScreen('login');
   document.getElementById('login-pass').value = '';
   document.getElementById('login-error').textContent = '';
@@ -751,7 +754,30 @@ setInterval(tickReloj, 1000);
 tickReloj();
 
 // ========== INIT ==========
-showScreen('login');
+async function iniciarApp(){
+  const sesionGuardada = localStorage.getItem('sesion_checador');
+  if(sesionGuardada){
+    try {
+      const s = JSON.parse(sesionGuardada);
+      if(s.esAdmin){
+        sesionActual = s;
+        showScreen('admin');
+        iniciarEscuchaAdmin();
+        return;
+      } else {
+        const empDoc = await getDoc(doc(db,'empleados', s.id));
+        if(empDoc.exists()){
+          sesionActual = s;
+          await mostrarEmpleado();
+          return;
+        }
+      }
+    } catch(e){}
+    localStorage.removeItem('sesion_checador');
+  }
+  showScreen('login');
+}
+iniciarApp();
 </script>
 </body>
 </html>
