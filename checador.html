@@ -154,11 +154,19 @@
   .admin-sub { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .admin-body { padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; padding-bottom: 80px; }
 
-  .admin-tabs { display: flex; gap: 8px; margin-bottom: 16px; background: var(--card); border-radius: 12px; padding: 6px; border: 1px solid var(--border); }
+  .admin-tabs {
+    display: flex; gap: 6px; margin-bottom: 16px;
+    background: var(--card); border-radius: 12px; padding: 5px;
+    border: 1px solid var(--border);
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .admin-tabs::-webkit-scrollbar { display: none; }
   .admin-tab {
-    flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent;
-    color: var(--muted); font-family: var(--font-body); font-size: 12px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s;
+    flex-shrink: 0; padding: 8px 12px; border: none; border-radius: 8px; background: transparent;
+    color: var(--muted); font-family: var(--font-body); font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.3px; cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
   }
   .admin-tab.active { background: var(--accent); color: #111; }
 
@@ -1125,7 +1133,7 @@ async function renderReporteSemanal(){
   });
 }
 
-async function enviarReporteSemanalWA(){
+window.enviarReporteSemanalWA = async function(){
   const fechas    = getFechasSemana();
   const fechaKeys = fechas.map(f=>f.key);
 
@@ -1175,7 +1183,7 @@ async function enviarReporteSemanalWA(){
   });
 
   window.open('https://wa.me/?text='+encodeURIComponent(lineas.join('\n').trim()),'_blank');
-}
+};
 
 // ========== REPORTE WHATSAPP ==========
 window.enviarReporteWA = async function(){
