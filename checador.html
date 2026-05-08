@@ -702,35 +702,37 @@ async function renderAdminHoy(){
     header.textContent = '🏪 ' + tNombre;
     cont.appendChild(header);
     gruposHoy[tNombre].forEach(emp=>{
-    const regsEmp = registrosCache.filter(r=>r.empId===emp.id).sort((a,b)=>a.timestamp-b.timestamp);
-    const estado  = estadoActual(regsEmp);
-    const asist   = asistMap[emp.id] || null;
-    const ms      = tiempoTrabajado(regsEmp);
+      const regsEmp = registrosCache.filter(r=>r.empId===emp.id).sort((a,b)=>a.timestamp-b.timestamp);
+      const estado  = estadoActual(regsEmp);
+      const asist   = asistMap[emp.id] || null;
+      const ms      = tiempoTrabajado(regsEmp);
 
-    const dotClass  = estado==='trabajando' ? 'dot-trabajando' : estado==='descanso' ? 'dot-descanso' : 'dot-fuera';
-    const chipAsist = asist
-      ? `<span class="asist-chip chip-${asist}">${asist}</span>`
-      : '<span class="asist-chip chip-sin">Sin marcar</span>';
+      const dotClass  = estado==='trabajando' ? 'dot-trabajando' : estado==='descanso' ? 'dot-descanso' : 'dot-fuera';
+      const chipAsist = asist
+        ? '<span class="asist-chip chip-'+asist+'">'+asist+'</span>'
+        : '<span class="asist-chip chip-sin">Sin marcar</span>';
 
-    const histHtml = regsEmp.length
-      ? regsEmp.slice().reverse().map(r=>`<div class="hist-row"><span class="hist-tipo">${iconos[r.tipo]||''} ${labelsT[r.tipo]||r.tipo}</span><span class="hist-hora">${r.hora}</span></div>`).join('')
-      : '<div class="empty-hist">Sin movimientos hoy</div>';
+      const histHtml = regsEmp.length
+        ? regsEmp.slice().reverse().map(function(r){ return '<div class="hist-row"><span class="hist-tipo">'+(iconos[r.tipo]||'')+' '+(labelsT[r.tipo]||r.tipo)+'</span><span class="hist-hora">'+r.hora+'</span></div>'; }).join('')
+        : '<div class="empty-hist">Sin movimientos hoy</div>';
 
-    const card = document.createElement('div');
-    card.className = 'worker-card';
-    card.innerHTML = `
-      <div class="worker-card-header">
-        <div><span class="worker-status-dot ${dotClass}"></span><span class="worker-card-name">${emp.nombre}</span>${chipAsist}</div>
-      </div>
-      <div class="worker-stats">
-        <div class="worker-stat">Estado<span>${estado}</span></div>
-        <div class="worker-stat">Tiempo<span>${msToHM(ms)}</span></div>
-        <div class="worker-stat">Movimientos<span>${regsEmp.length}</span></div>
-      </div>
-      <div class="worker-hist-toggle" onclick="toggleHist(this)">▼ Ver movimientos</div>
-      <div class="worker-hist">${histHtml}</div>`;
-    cont.appendChild(card);
-  });
+      const card = document.createElement('div');
+      card.className = 'worker-card';
+      card.innerHTML =
+        '<div class="worker-card-header">' +
+          '<div><span class="worker-status-dot '+dotClass+'"></span>' +
+          '<span class="worker-card-name">'+emp.nombre+'</span>'+chipAsist+'</div>' +
+        '</div>' +
+        '<div class="worker-stats">' +
+          '<div class="worker-stat">Estado<span>'+estado+'</span></div>' +
+          '<div class="worker-stat">Tiempo<span>'+msToHM(ms)+'</span></div>' +
+          '<div class="worker-stat">Movimientos<span>'+regsEmp.length+'</span></div>' +
+        '</div>' +
+        '<div class="worker-hist-toggle" onclick="toggleHist(this)">&#9660; Ver movimientos</div>' +
+        '<div class="worker-hist">'+histHtml+'</div>';
+      cont.appendChild(card);
+    }); // fin empleados de tienda
+  }); // fin gruposHoy
 }
 
 async function renderAdminLista(){
@@ -754,19 +756,22 @@ async function renderAdminLista(){
     grupos[tNombre].push(emp);
   });
 
-  cont.innerHTML = Object.keys(grupos).map(tNombre=>`
-    <div class="section-date-header" style="margin-top:10px">🏪 ${tNombre}</div>
-    ${grupos[tNombre].map(emp=>`
-    <div class="worker-card">
-      <div class="worker-card-header">
-        <div class="worker-card-name">${emp.nombre}</div>
-        <div>
-          <span style="font-size:12px;color:var(--muted)">🔑 ${emp.pass}</span>
-          <button class="delete-emp-btn" onclick="eliminarEmpleado('${emp.id}')">Eliminar</button>
-        </div>
-      </div>
-    </div>`).join('')}
-  `).join('');
+  let listaHtml = '';
+  Object.keys(grupos).forEach(tNombre => {
+    listaHtml += '<div class="section-date-header" style="margin-top:10px">🏪 ' + tNombre + '</div>';
+    grupos[tNombre].forEach(emp => {
+      listaHtml += '<div class="worker-card">' +
+        '<div class="worker-card-header">' +
+          '<div class="worker-card-name">' + emp.nombre + '</div>' +
+          '<div>' +
+            '<span style="font-size:12px;color:var(--muted)">🔑 ' + emp.pass + '</span>' +
+            '<button class="delete-emp-btn" onclick="eliminarEmpleado(\'' + emp.id + '\')">Eliminar</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    });
+  });
+  cont.innerHTML = listaHtml;
 }
 
 window.adminTab = function(tab, btn){
