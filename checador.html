@@ -198,7 +198,17 @@
   }
   .reporte-btn:active { opacity: 0.85; }
 
-  .delete-emp-btn { background: transparent; border: 1px solid #333; border-radius: 6px; padding: 4px 10px; color: var(--accent2); font-size: 11px; font-weight: 700; cursor: pointer; margin-left: 8px; }
+  .delete-emp-btn { background: transparent; border: 1px solid #333; border-radius: 6px; padding: 4px 10px; color: var(--accent2); font-size: 11px; font-weight: 700; cursor: pointer; }
+  .edit-emp-btn { background: transparent; border: 1px solid var(--accent); border-radius: 6px; padding: 4px 10px; color: var(--accent); font-size: 11px; font-weight: 700; cursor: pointer; }
+
+  /* MODAL EDITAR */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:500; align-items:center; justify-content:center; padding:20px; }
+  .modal-overlay.active { display:flex; }
+  .modal-box { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:24px; width:100%; max-width:360px; }
+  .modal-title { font-family:var(--font-display); font-size:18px; letter-spacing:1px; color:var(--accent); margin-bottom:18px; }
+  .modal-btns { display:flex; gap:8px; margin-top:16px; }
+  .modal-btn-cancel { flex:1; padding:11px; background:transparent; border:1px solid var(--border); border-radius:8px; color:var(--muted); font-family:var(--font-body); font-size:13px; font-weight:700; cursor:pointer; }
+  .modal-btn-save { flex:1; padding:11px; background:var(--accent); border:none; border-radius:8px; color:#111; font-family:var(--font-body); font-size:13px; font-weight:700; cursor:pointer; }
 
   #reloj-global {
     font-family: var(--font-display); font-size: 13px; letter-spacing: 1px;
@@ -362,6 +372,33 @@
 </div>
 
 <div id="reloj-global"></div>
+
+<!-- MODAL EDITAR EMPLEADO -->
+<div class="modal-overlay" id="modal-editar">
+  <div class="modal-box">
+    <div class="modal-title">EDITAR EMPLEADO</div>
+    <input type="hidden" id="edit-emp-id">
+    <div class="add-field">
+      <div class="add-label">Nombre</div>
+      <input class="add-input" id="edit-nombre" type="text" placeholder="Nombre completo">
+    </div>
+    <div class="add-field">
+      <div class="add-label">Contraseña</div>
+      <input class="add-input" id="edit-pass" type="text" placeholder="Contraseña">
+    </div>
+    <div class="add-field">
+      <div class="add-label">Tienda</div>
+      <select class="add-input" id="edit-tienda" style="cursor:pointer">
+        <option value="">— Sin asignar —</option>
+      </select>
+    </div>
+    <div class="login-error" id="edit-error"></div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="modal-btn-save" onclick="guardarEdicionEmpleado()">Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- FIREBASE -->
 <script type="module">
@@ -762,9 +799,12 @@ async function renderAdminLista(){
     grupos[tNombre].forEach(emp => {
       listaHtml += '<div class="worker-card">' +
         '<div class="worker-card-header">' +
-          '<div class="worker-card-name">' + emp.nombre + '</div>' +
           '<div>' +
-            '<span style="font-size:12px;color:var(--muted)">🔑 ' + emp.pass + '</span>' +
+            '<div class="worker-card-name">' + emp.nombre + '</div>' +
+            '<div style="font-size:11px;color:var(--muted);margin-top:2px">🏪 ' + (emp.tienda && tMap[emp.tienda] ? tMap[emp.tienda] : 'Sin tienda') + ' &nbsp;|&nbsp; 🔑 ' + emp.pass + '</div>' +
+          '</div>' +
+          '<div style="display:flex;gap:6px">' +
+            '<button class="edit-emp-btn" onclick="abrirEditarEmpleado(\'' + emp.id + '\')">Editar</button>' +
             '<button class="delete-emp-btn" onclick="eliminarEmpleado(\'' + emp.id + '\')">Eliminar</button>' +
           '</div>' +
         '</div>' +
@@ -904,6 +944,72 @@ async function cargarTiendasSelector(){
     sel.appendChild(opt);
   });
 }
+
+
+
+// ========== EDITAR EMPLEADO ==========
+window.abrirEditarEmpleado = async function(id){
+  const empDoc = await getDoc(doc(db,'empleados', id));
+  if(!empDoc.exists()) return;
+  const emp = empDoc.data();
+
+  document.getElementById('edit-emp-id').value  = id;
+  document.getElementById('edit-nombre').value  = emp.nombre || '';
+  document.getElementById('edit-pass').value    = emp.pass   || '';
+  document.getElementById('edit-error').textContent = '';
+
+  // Cargar tiendas en el selector del modal
+  const tSnap = await getDocs(collection(db,'tiendas'));
+  const sel   = document.getElementById('edit-tienda');
+  sel.innerHTML = '<option value="">— Sin asignar —</option>';
+  tSnap.forEach(d=>{
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.data().nombre;
+    if(d.id === emp.tienda) opt.selected = true;
+    sel.appendChild(opt);
+  });
+
+  document.getElementById('modal-editar').classList.add('active');
+};
+
+window.cerrarModal = function(){
+  document.getElementById('modal-editar').classList.remove('active');
+};
+
+window.guardarEdicionEmpleado = async function(){
+  const id     = document.getElementById('edit-emp-id').value;
+  const nombre = document.getElementById('edit-nombre').value.trim();
+  const pass   = document.getElementById('edit-pass').value.trim();
+  const tienda = document.getElementById('edit-tienda').value;
+  const err    = document.getElementById('edit-error');
+  err.textContent = ''; err.style.color = '';
+
+  if(!nombre || !pass){ err.textContent = 'Completa nombre y contraseña.'; return; }
+  if(pass === ADMIN_PASS){ err.textContent = 'Esa contraseña está reservada.'; return; }
+
+  // Verificar que la contraseña no la use otro empleado
+  const snap = await getDocs(collection(db,'empleados'));
+  let duplicado = false;
+  snap.forEach(d=>{ if(d.id !== id && d.data().pass === pass) duplicado = true; });
+  if(duplicado){ err.textContent = 'Esa contraseña ya está en uso.'; return; }
+
+  try {
+    await setDoc(doc(db,'empleados', id), { nombre, pass, tienda: tienda || '', creadoEn: Date.now() });
+    cerrarModal();
+    // Actualizar cache
+    const idx = empleadosCache.findIndex(e=>e.id===id);
+    if(idx>=0) empleadosCache[idx] = { id, nombre, pass, tienda: tienda||'' };
+    renderAdminLista();
+  } catch(e){
+    err.textContent = 'Error al guardar.';
+  }
+};
+
+// Cerrar modal al tocar fuera
+document.getElementById('modal-editar').addEventListener('click', function(e){
+  if(e.target === this) cerrarModal();
+});
 
 
 // ========== REPORTE SEMANAL ==========
