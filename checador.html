@@ -617,23 +617,35 @@ async function cargarFiltrosTienda(){
   });
 }
 
-function iniciarEscuchaAdmin(){
-  cargarFiltrosTienda();
-  renderAdminHoy();
-  renderAdminLista();
+async function iniciarEscuchaAdmin(){
+  try {
+    await cargarFiltrosTienda();
+    await renderAdminHoy();
+    await renderAdminLista();
+  } catch(e){
+    console.error('Error admin:', e);
+  }
 
   // Escucha en tiempo real
-  const fecha = fechaHoy();
-  unsubAdmin = onSnapshot(
-    query(collection(db,'registros'), where('fecha','==',fecha)),
-    snap => {
-      registrosCache = [];
-      snap.forEach(d=> registrosCache.push({ id: d.id, ...d.data() }));
-      if(document.getElementById('admin-tab-hoy').style.display !== 'none') renderAdminHoy();
-      setSyncStatus(document.getElementById('admin-sync'), true, 'En vivo ✓');
-    },
-    () => setSyncStatus(document.getElementById('admin-sync'), false, 'Sin conexión')
-  );
+  try {
+    const fecha = fechaHoy();
+    unsubAdmin = onSnapshot(
+      query(collection(db,'registros'), where('fecha','==',fecha)),
+      snap => {
+        registrosCache = [];
+        snap.forEach(d=> registrosCache.push({ id: d.id, ...d.data() }));
+        const tabHoy = document.getElementById('admin-tab-hoy');
+        if(tabHoy && tabHoy.style.display !== 'none') renderAdminHoy();
+        setSyncStatus(document.getElementById('admin-sync'), true, 'En vivo ✓');
+      },
+      err => {
+        console.error('onSnapshot error:', err);
+        setSyncStatus(document.getElementById('admin-sync'), false, 'Sin conexión');
+      }
+    );
+  } catch(e){
+    console.error('Error escucha:', e);
+  }
 }
 
 async function renderAdminHoy(){
@@ -769,9 +781,7 @@ window.adminTab = function(tab, btn){
   if(tab==='semana')    renderReporteSemanal();
   if(tab==='empleados') renderAdminLista();
   if(tab==='tiendas')   renderTiendas();
-  if(tab==='agregar'){  cargarTiendasSelector(); }
-  // Recargar filtros siempre que cambien tabs
-  cargarFiltrosTienda();
+  if(tab==='agregar')   cargarTiendasSelector();
 };
 
 window.toggleHist = function(el){
@@ -1124,12 +1134,18 @@ async function iniciarApp(){
           return;
         }
       }
-    } catch(e){}
+    } catch(e){
+      console.error('Error restaurando sesion:', e);
+    }
     localStorage.removeItem('sesion_checador');
   }
   showScreen('login');
 }
-iniciarApp();
+
+iniciarApp().catch(e => {
+  console.error('Error fatal init:', e);
+  showScreen('login');
+});
 </script>
 </body>
 </html>
