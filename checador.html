@@ -292,17 +292,41 @@
       <button class="admin-tab active" onclick="adminTab('hoy', this)">Hoy</button>
       <button class="admin-tab" onclick="adminTab('semana', this)">Semana</button>
       <button class="admin-tab" onclick="adminTab('empleados', this)">Empleados</button>
+      <button class="admin-tab" onclick="adminTab('tiendas', this)">Tiendas</button>
       <button class="admin-tab" onclick="adminTab('agregar', this)">+ Agregar</button>
     </div>
     <div id="admin-tab-hoy">
       <div class="sync-indicator" id="admin-sync">●  Conectando...</div>
+      <div style="margin-bottom:10px">
+        <select class="add-input" id="filtro-tienda-hoy" onchange="renderAdminHoy()" style="cursor:pointer;font-size:13px;padding:10px 14px">
+          <option value="">🏪 Todas las tiendas</option>
+        </select>
+      </div>
       <div id="admin-workers-hoy"></div>
       <button class="reporte-btn" onclick="enviarReporteWA()">
         <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Enviar reporte por WhatsApp
       </button>
     </div>
+    <div id="admin-tab-tiendas" style="display:none">
+      <div class="add-emp-card" style="margin-bottom:14px">
+        <h3>NUEVA TIENDA</h3>
+        <div class="add-field">
+          <div class="add-label">Nombre de la tienda</div>
+          <input class="add-input" id="new-tienda-nombre" type="text" placeholder="Ej: Abarrotes 3 Plebes">
+        </div>
+        <button class="add-btn" onclick="agregarTienda()">Agregar tienda</button>
+        <div class="login-error" id="tienda-error"></div>
+      </div>
+      <div id="tiendas-list"></div>
+    </div>
+
     <div id="admin-tab-semana" style="display:none">
+      <div style="margin-bottom:10px">
+        <select class="add-input" id="filtro-tienda-semana" onchange="renderReporteSemanal()" style="cursor:pointer;font-size:13px;padding:10px 14px">
+          <option value="">🏪 Todas las tiendas</option>
+        </select>
+      </div>
       <div id="semana-container"></div>
       <button class="reporte-btn" style="margin-top:12px" onclick="enviarReporteSemanalWA()">
         <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:#fff;flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -319,6 +343,12 @@
         <div class="add-field">
           <div class="add-label">Nombre completo</div>
           <input class="add-input" id="new-nombre" type="text" placeholder="Ej: Juan Pérez">
+        </div>
+        <div class="add-field">
+          <div class="add-label">Tienda</div>
+          <select class="add-input" id="new-tienda" style="cursor:pointer">
+            <option value="">— Sin asignar —</option>
+          </select>
         </div>
         <div class="add-field">
           <div class="add-label">Contraseña</div>
@@ -569,7 +599,26 @@ async function guardarAsistenciaDB(empId, tipo){
 }
 
 // ========== ADMIN ==========
+async function cargarFiltrosTienda(){
+  const snap = await getDocs(collection(db,'tiendas'));
+  ['filtro-tienda-hoy','filtro-tienda-semana'].forEach(selId=>{
+    const sel = document.getElementById(selId);
+    if(!sel) return;
+    // Guardar valor actual
+    const valActual = sel.value;
+    sel.innerHTML = '<option value="">🏪 Todas las tiendas</option>';
+    snap.forEach(d=>{
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = '🏪 ' + d.data().nombre;
+      sel.appendChild(opt);
+    });
+    sel.value = valActual;
+  });
+}
+
 function iniciarEscuchaAdmin(){
+  cargarFiltrosTienda();
   renderAdminHoy();
   renderAdminLista();
 
@@ -608,12 +657,39 @@ async function renderAdminHoy(){
   const asistMap = {};
   asistSnap.forEach(d=> asistMap[d.data().empId] = d.data().tipo);
 
+  // Cargar tiendas
+  const tSnap2 = await getDocs(collection(db,'tiendas'));
+  const tMap2  = {};
+  tSnap2.forEach(d=> tMap2[d.id] = d.data().nombre);
+
+  // Filtro activo
+  const filtroHoy = document.getElementById('filtro-tienda-hoy') ? document.getElementById('filtro-tienda-hoy').value : '';
+
+  // Filtrar empleados por tienda si hay filtro
+  const empsFiltrados = filtroHoy
+    ? empleadosCache.filter(e=> e.tienda === filtroHoy)
+    : empleadosCache;
+
+  // Agrupar empleados por tienda
+  const gruposHoy = {};
+  empsFiltrados.forEach(emp=>{
+    const tn = emp.tienda && tMap2[emp.tienda] ? tMap2[emp.tienda] : 'Sin tienda';
+    if(!gruposHoy[tn]) gruposHoy[tn] = [];
+    gruposHoy[tn].push(emp);
+  });
+
   cont.innerHTML = '<div class="section-date-header">' + hoyStr + '</div>';
 
   const iconos = { entrada:'🟢', salida:'🔴', descanso:'☕', regreso:'↩️' };
   const labelsT = { entrada:'Entrada', salida:'Salida', descanso:'Descanso', regreso:'Regreso' };
 
-  empleadosCache.forEach(emp=>{
+  Object.keys(gruposHoy).forEach(tNombre=>{
+    const header = document.createElement('div');
+    header.className = 'section-date-header';
+    header.style.marginTop = '14px';
+    header.textContent = '🏪 ' + tNombre;
+    cont.appendChild(header);
+    gruposHoy[tNombre].forEach(emp=>{
     const regsEmp = registrosCache.filter(r=>r.empId===emp.id).sort((a,b)=>a.timestamp-b.timestamp);
     const estado  = estadoActual(regsEmp);
     const asist   = asistMap[emp.id] || null;
@@ -653,7 +729,22 @@ async function renderAdminLista(){
   const cont = document.getElementById('admin-workers-list');
   if(!empleadosCache.length){ cont.innerHTML = '<div class="empty-hist" style="padding:30px 0">No hay empleados.</div>'; return; }
 
-  cont.innerHTML = empleadosCache.map(emp=>`
+  // Cargar tiendas para mostrar nombre
+  const tSnap = await getDocs(collection(db,'tiendas'));
+  const tMap  = {};
+  tSnap.forEach(d=> tMap[d.id] = d.data().nombre);
+
+  // Agrupar por tienda
+  const grupos = {};
+  empleadosCache.forEach(emp=>{
+    const tNombre = emp.tienda && tMap[emp.tienda] ? tMap[emp.tienda] : 'Sin tienda';
+    if(!grupos[tNombre]) grupos[tNombre] = [];
+    grupos[tNombre].push(emp);
+  });
+
+  cont.innerHTML = Object.keys(grupos).map(tNombre=>`
+    <div class="section-date-header" style="margin-top:10px">🏪 ${tNombre}</div>
+    ${grupos[tNombre].map(emp=>`
     <div class="worker-card">
       <div class="worker-card-header">
         <div class="worker-card-name">${emp.nombre}</div>
@@ -662,7 +753,8 @@ async function renderAdminLista(){
           <button class="delete-emp-btn" onclick="eliminarEmpleado('${emp.id}')">Eliminar</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`).join('')}
+  `).join('');
 }
 
 window.adminTab = function(tab, btn){
@@ -671,10 +763,15 @@ window.adminTab = function(tab, btn){
   document.getElementById('admin-tab-hoy').style.display       = tab==='hoy'      ? 'block':'none';
   document.getElementById('admin-tab-semana').style.display     = tab==='semana'   ? 'block':'none';
   document.getElementById('admin-tab-empleados').style.display  = tab==='empleados'? 'block':'none';
+  document.getElementById('admin-tab-tiendas').style.display    = tab==='tiendas'  ? 'block':'none';
   document.getElementById('admin-tab-agregar').style.display    = tab==='agregar'  ? 'block':'none';
   if(tab==='hoy')       renderAdminHoy();
   if(tab==='semana')    renderReporteSemanal();
   if(tab==='empleados') renderAdminLista();
+  if(tab==='tiendas')   renderTiendas();
+  if(tab==='agregar'){  cargarTiendasSelector(); }
+  // Recargar filtros siempre que cambien tabs
+  cargarFiltrosTienda();
 };
 
 window.toggleHist = function(el){
@@ -697,8 +794,9 @@ window.agregarEmpleado = async function(){
   snap.forEach(d=>{ if(d.data().pass===pass) duplicado=true; });
   if(duplicado){ err.textContent='Esa contraseña ya está en uso.'; return; }
 
+  const tiendaId  = document.getElementById('new-tienda').value;
   try {
-    await addDoc(collection(db,'empleados'), { nombre, pass, creadoEn: Date.now() });
+    await addDoc(collection(db,'empleados'), { nombre, pass, tienda: tiendaId || '', creadoEn: Date.now() });
     document.getElementById('new-nombre').value = '';
     document.getElementById('new-pass').value   = '';
     err.style.color = 'var(--green)';
@@ -718,6 +816,79 @@ window.eliminarEmpleado = async function(id){
     renderAdminHoy();
   } catch(e){ alert('Error al eliminar.'); }
 };
+
+
+
+// ========== TIENDAS ==========
+async function renderTiendas(){
+  const snap = await getDocs(collection(db,'tiendas'));
+  const tiendas = [];
+  snap.forEach(d=> tiendas.push({ id: d.id, ...d.data() }));
+  const cont = document.getElementById('tiendas-list');
+
+  if(!tiendas.length){
+    cont.innerHTML = '<div class="empty-hist">No hay tiendas registradas.</div>';
+    return;
+  }
+
+  // Cargar empleados para mostrar cuántos hay por tienda
+  const empSnap = await getDocs(collection(db,'empleados'));
+  const emps = [];
+  empSnap.forEach(d=> emps.push({ id: d.id, ...d.data() }));
+
+  cont.innerHTML = tiendas.map(t => {
+    const empsDeTienda = emps.filter(e=> e.tienda === t.id);
+    return `<div class="worker-card">
+      <div class="worker-card-header">
+        <div>
+          <div class="worker-card-name">🏪 ${t.nombre}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">${empsDeTienda.length} empleado(s): ${empsDeTienda.map(e=>e.nombre).join(', ') || 'ninguno'}</div>
+        </div>
+        <button class="delete-emp-btn" onclick="eliminarTienda('${t.id}')">Eliminar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.agregarTienda = async function(){
+  const nombre = document.getElementById('new-tienda-nombre').value.trim();
+  const err    = document.getElementById('tienda-error');
+  err.textContent = ''; err.style.color = '';
+  if(!nombre){ err.textContent = 'Escribe el nombre de la tienda.'; return; }
+
+  try {
+    await addDoc(collection(db,'tiendas'), { nombre, creadoEn: Date.now() });
+    document.getElementById('new-tienda-nombre').value = '';
+    err.style.color = 'var(--green)';
+    err.textContent = '✅ Tienda agregada.';
+    setTimeout(()=>{ err.textContent=''; err.style.color=''; }, 2000);
+    renderTiendas();
+    cargarTiendasSelector();
+  } catch(e){
+    err.textContent = 'Error al guardar.';
+  }
+};
+
+window.eliminarTienda = async function(id){
+  if(!confirm('¿Eliminar esta tienda?')) return;
+  try {
+    await deleteDoc(doc(db,'tiendas',id));
+    renderTiendas();
+  } catch(e){ alert('Error al eliminar.'); }
+};
+
+async function cargarTiendasSelector(){
+  const snap = await getDocs(collection(db,'tiendas'));
+  const sel  = document.getElementById('new-tienda');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— Sin asignar —</option>';
+  snap.forEach(d=>{
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.data().nombre;
+    sel.appendChild(opt);
+  });
+}
 
 
 // ========== REPORTE SEMANAL ==========
@@ -755,6 +926,10 @@ async function renderReporteSemanal(){
 
   if(!emps.length){ cont.innerHTML = '<div class="empty-hist">No hay empleados.</div>'; return; }
 
+  // Filtro por tienda semana
+  const filtroSemana = document.getElementById('filtro-tienda-semana') ? document.getElementById('filtro-tienda-semana').value : '';
+  const empsFiltradosSemana = filtroSemana ? emps.filter(e=> e.tienda === filtroSemana) : emps;
+
   // Cargar registros de toda la semana
   const q = query(collection(db,'registros'), where('fecha','in', fechaKeys));
   const regSnap = await getDocs(q);
@@ -770,9 +945,15 @@ async function renderReporteSemanal(){
   const labelsT = { entrada:'Entrada', salida:'Salida', descanso:'Descanso', regreso:'Regreso' };
 
   const semanaLabel = fechas[0].label.split(' ')[1] + ' – ' + fechas[6].label.split(' ')[1];
-  cont.innerHTML = '<div class="section-date-header">Semana: ' + fechas[0].label + ' al ' + fechas[6].label + '</div>';
 
-  emps.forEach(emp => {
+  // Cargar mapa de tiendas para agrupar
+  const tSnapS = await getDocs(collection(db,'tiendas'));
+  const tMapS  = {};
+  tSnapS.forEach(d=> tMapS[d.id] = d.data().nombre);
+
+  cont.innerHTML = '<div class="section-date-header">Semana: ' + fechas[0].label + ' al ' + fechas[6].label + (filtroSemana && tMapS[filtroSemana] ? ' · 🏪 ' + tMapS[filtroSemana] : '') + '</div>';
+
+  empsFiltradosSemana.forEach(emp => {
     let totalMs = 0;
     let diasTrabajados = 0;
 
@@ -832,6 +1013,10 @@ async function enviarReporteSemanalWA(){
   empSnap.forEach(d=> emps.push({ id: d.id, ...d.data() }));
   if(!emps.length){ alert('No hay empleados.'); return; }
 
+  // Aplicar filtro de tienda si está activo
+  const filtroWA = document.getElementById('filtro-tienda-semana') ? document.getElementById('filtro-tienda-semana').value : '';
+  const empsWA   = filtroWA ? emps.filter(e=> e.tienda === filtroWA) : emps;
+
   const regSnap = await getDocs(query(collection(db,'registros'), where('fecha','in', fechaKeys)));
   const todosRegs = [];
   regSnap.forEach(d=> todosRegs.push({ id: d.id, ...d.data() }));
@@ -847,7 +1032,7 @@ async function enviarReporteSemanalWA(){
     ''
   ];
 
-  emps.forEach(emp => {
+  empsWA.forEach(emp => {
     let totalMs = 0;
     let diasTrabajados = 0;
     lineas.push('👤 *' + emp.nombre.toUpperCase() + '*');
