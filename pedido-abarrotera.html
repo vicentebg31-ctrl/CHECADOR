@@ -921,13 +921,19 @@ function renderResumen() {
   ).join('');
 }
 
-window.enviarWA = function(prov, label) {
+window.enviarWA = function(prov) {
   const hoyStr = dias[hoy.getDay()]+' '+hoy.getDate()+' '+meses[hoy.getMonth()]+' '+hoy.getFullYear();
   const lineas = ['*PEDIDO - Abarrotes 3 Plebes*','Fecha: '+hoyStr,'Proveedor: *'+prov.toUpperCase()+'*',''];
-  const cants = sesion.esAdmin ? Object.values(todasCantidades).reduce((acc,c)=>{ Object.keys(c).forEach(k=>{ acc[k]=(acc[k]||0)+c[k]; }); return acc; }, {}) : cantidades;
-  Object.keys(ESTANTES).forEach(ek => ESTANTES[ek].productos.forEach(p => {
-    if (p.proveedor===prov && (cants[p.id]||0)>0) lineas.push(p.nombre+': '+cants[p.id]);
-  }));
+  // Combinar cantidades de todos los estantes, solo por proveedor
+  const cants = sesion.esAdmin
+    ? Object.values(todasCantidades).reduce((acc,c)=>{ Object.keys(c).forEach(k=>{ acc[k]=(acc[k]||0)+c[k]; }); return acc; }, {})
+    : cantidades;
+  Object.keys(ESTANTES).forEach(ek => {
+    ESTANTES[ek].productos.forEach(p => {
+      if (p.proveedor===prov && (cants[p.id]||0)>0) lineas.push(p.nombre+': '+cants[p.id]);
+    });
+  });
+  if (lineas.length <= 4) { alert('No hay productos de '+prov+' en el pedido.'); return; }
   window.open('https://wa.me/?text='+encodeURIComponent(lineas.join('\n').trim()),'_blank');
 };
 
