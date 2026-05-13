@@ -417,7 +417,7 @@ function ensureDefaults() {
   save();
 }
 
-function uid(){ return Date.now() + Math.floor(Math.random()*9999); }
+function uid(){ return 'c' + Date.now() + Math.floor(Math.random()*999); }
 function save(){ localStorage.setItem(SK, JSON.stringify(cards)); }
 function fmt(n){ return '$' + Number(n).toLocaleString('es-MX'); }
 
@@ -536,7 +536,7 @@ function render() {
     wrap.className = 'card-wrap';
     wrap.style.animationDelay = (idx * 0.06) + 's';
     wrap.innerHTML = `
-      <div class="card ${isOpen ? 'open' : ''}" onclick="toggle(${c.id})">
+      <div class="card ${isOpen ? 'open' : ''}" onclick="toggle('${c.id}')">
         <div class="card-band" style="background:${color}"></div>
         <div class="card-head">
           <div class="card-name">${c.nombre}</div>
@@ -588,11 +588,11 @@ function render() {
         </div>
         <div class="saldo-row">
           <input type="number" id="ns-${c.id}" value="${c.saldo}" placeholder="Nuevo saldo">
-          <button class="btn-upd" onclick="updSaldo(${c.id})">Actualizar</button>
+          <button class="btn-upd" onclick="updSaldo('${c.id}')">Actualizar</button>
         </div>
         <div class="btn-row">
-          <button class="btn-edit" onclick="editCard(${c.id})">&#9998; Editar</button>
-          <button class="btn-del" onclick="delCard(${c.id})">&#128465; Eliminar</button>
+          <button class="btn-edit" onclick="editCard('${c.id}')">&#9998; Editar</button>
+          <button class="btn-del" onclick="delCard('${c.id}')">&#128465; Eliminar</button>
         </div>
       </div>
     `;
@@ -600,16 +600,21 @@ function render() {
   });
 }
 
-function toggle(id) { openId = openId === id ? null : id; render(); }
+function toggle(id) {
+  // Convertir a string para comparación segura
+  const sid = String(id);
+  openId = String(openId) === sid ? null : sid;
+  render();
+}
 function updSaldo(id) {
   const v = document.getElementById('ns-' + id).value;
-  const c = cards.find(x => x.id === id);
+  const c = cards.find(x => String(x.id) === String(id));
   if (c && v !== '') { c.saldo = parseFloat(v)||0; save(); render(); }
 }
 
 function openModal(id = null) {
-  editId = id;
-  const c = id ? cards.find(x => x.id === id) : null;
+  editId = id ? String(id) : null;
+  const c = id ? cards.find(x => String(x.id) === String(id)) : null;
   document.getElementById('mtitle').textContent = c ? 'Editar tarjeta' : 'Nueva tarjeta';
   document.getElementById('fn').value  = c ? c.nombre  : '';
   document.getElementById('fc').value  = c ? c.credito : '';
@@ -619,7 +624,7 @@ function openModal(id = null) {
   document.getElementById('fpct').value= c ? c.pct     : '20';
   document.getElementById('overlay').classList.add('open');
 }
-function editCard(id) { openModal(id); }
+function editCard(id) { openModal(String(id)); }
 function closeModal() { document.getElementById('overlay').classList.remove('open'); editId = null; }
 function closeOut(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
 
@@ -632,7 +637,7 @@ function saveCard() {
   const pct     = parseFloat(document.getElementById('fpct').value)||20;
   if (!nombre || !credito) return;
   if (editId) {
-    Object.assign(cards.find(x => x.id === editId), {nombre,credito,saldo,corte,pago,pct});
+    Object.assign(cards.find(x => String(x.id) === String(editId)), {nombre,credito,saldo,corte,pago,pct});
   } else {
     cards.push({id:uid(),nombre,credito,saldo,corte,pago,pct});
   }
@@ -641,7 +646,7 @@ function saveCard() {
 
 function delCard(id) {
   if (!confirm('Eliminar tarjeta?')) return;
-  cards = cards.filter(x => x.id !== id);
+  cards = cards.filter(x => String(x.id) !== String(id));
   openId = null; save(); render();
 }
 
