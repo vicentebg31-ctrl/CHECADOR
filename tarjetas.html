@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarjetas</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f5f3ef;
+  --white:#ffffff;
+  --ink:#1a1a1a;
+  --ink2:#555;
+  --line:#e0ddd8;
+  --green:#1a7a4a;
+  --green-bg:#eaf5ee;
+  --amber:#b45309;
+  --amber-bg:#fef3e2;
+  --red:#c0392b;
+  --red-bg:#fdecea;
+  --purple:#5b21b6;
+  --purple-bg:#ede9fe;
+}
+
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  padding:28px 16px 100px;
+}
+
+.hdr{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  margin-bottom:28px;
+  padding-bottom:16px;
+  border-bottom:2px solid var(--ink);
+}
+.hdr-left h1{
+  font-family:'Playfair Display',serif;
+  font-size:28px;
+  font-weight:700;
+  letter-spacing:-1px;
+  line-height:1;
+}
+.hdr-left p{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  color:var(--ink2);
+  margin-top:4px;
+  letter-spacing:.5px;
+}
+.hdr-right{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  color:var(--ink2);
+  text-align:right;
+}
+
+.summary{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:1px;
+  background:var(--ink);
+  border:1.5px solid var(--ink);
+  border-radius:12px;
+  overflow:hidden;
+  margin-bottom:24px;
+}
+.sum-cell{
+  background:var(--white);
+  padding:14px 16px;
+}
+.sum-cell label{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  color:var(--ink2);
+  display:block;
+  margin-bottom:4px;
+}
+.sum-cell span{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:15px;
+  font-weight:500;
+}
+
+.cards-list{display:flex;flex-direction:column;gap:12px}
+
+.card-wrap{animation:fadeUp .3s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.card{
+  background:var(--white);
+  border:1.5px solid var(--line);
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+}
+.card:hover{box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.card.open{border-color:var(--ink)}
+
+.card-band{height:6px;width:100%;}
+
+.card-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 18px 10px;
+}
+.card-name{
+  font-family:'Playfair Display',serif;
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-.5px;
+}
+.card-chevron{
+  font-size:16px;
+  color:var(--ink2);
+  transition:transform .2s;
+}
+.card.open .card-chevron{transform:rotate(180deg)}
+
+.card-amounts{
+  display:flex;
+  align-items:center;
+  gap:0;
+  padding:0 18px 14px;
+}
+.amt-block{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+.amt-block.amt-right{align-items:flex-end;flex:0 0 auto;}
+.amt-label{
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:1.5px;
+  color:var(--ink2);
+  margin-bottom:3px;
+}
+.amt-divider{
+  width:1px;height:36px;
+  background:var(--line);
+  margin:0 14px;flex-shrink:0;
+}
+.used-amt{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:20px;font-weight:500;
+}
+.limit-amt{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:14px;color:var(--ink2);
+}
+
+.bar-wrap{padding:0 18px 10px;position:relative}
+.bar-track{
+  height:5px;background:var(--line);
+  border-radius:99px;overflow:visible;position:relative;
+}
+.bar-fill{
+  height:100%;border-radius:99px;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  position:relative;
+}
+.bar-tick{
+  position:absolute;top:-4px;
+  width:2px;height:13px;
+  background:var(--amber);border-radius:1px;
+}
+.bar-tick-label{
+  position:absolute;top:-18px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:8px;color:var(--amber);
+  transform:translateX(-50%);white-space:nowrap;
+}
+
+.pago-banner{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:0 18px 12px;padding:10px 14px;
+  border-radius:10px;
+  background:var(--amber-bg);border:1px solid #f6d28d;
+}
+.pago-banner.zero{background:var(--green-bg);border-color:#a7f3c8;}
+.pago-banner-left{display:flex;flex-direction:column;gap:2px}
+.pago-banner-label{
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--amber);font-weight:600;
+}
+.pago-banner.zero .pago-banner-label{color:var(--green)}
+.pago-banner-amt{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:20px;font-weight:500;color:var(--amber);
+}
+.pago-banner.zero .pago-banner-amt{color:var(--green)}
+.pago-banner-pct{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:var(--amber);opacity:.7;
+}
+.pago-banner.zero .pago-banner-pct{color:var(--green)}
+
+.chip-row{display:flex;gap:6px;padding:8px 18px 14px;}
+.chip{
+  padding:4px 10px;border-radius:99px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;font-weight:500;
+  border:1px solid var(--line);color:var(--ink2);
+}
+.chip.green{background:var(--green-bg);color:var(--green);border-color:transparent}
+.chip.amber{background:var(--amber-bg);color:var(--amber);border-color:transparent}
+.chip.red{background:var(--red-bg);color:var(--red);border-color:transparent}
+
+.detail{display:none;border-top:1px solid var(--line);padding:16px 18px 18px;}
+.detail.open{display:block}
+
+.section-label{
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:2px;color:var(--ink2);margin-bottom:10px;
+}
+
+.pay-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.pay-step{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 14px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg);
+}
+.ps-num{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;font-weight:500;flex-shrink:0;
+}
+.ps-num.amber{background:var(--amber-bg);color:var(--amber)}
+.ps-num.green{background:var(--green-bg);color:var(--green)}
+.ps-num.grey{background:var(--line);color:var(--ink2)}
+.ps-body{flex:1}
+.ps-date{font-size:10px;color:var(--ink2);margin-bottom:2px}
+.ps-action{font-size:12px;font-weight:600;margin-bottom:1px}
+.ps-amount{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;}
+.ps-badge{
+  font-size:9px;font-weight:600;
+  padding:3px 8px;border-radius:99px;
+  text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;
+}
+.ps-badge.now{background:var(--red-bg);color:var(--red)}
+.ps-badge.soon{background:var(--amber-bg);color:var(--amber)}
+.ps-badge.ok{background:var(--line);color:var(--ink2)}
+
+.stats-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:6px;margin-bottom:14px;
+}
+.stat-box{
+  padding:10px 12px;border-radius:10px;
+  border:1px solid var(--line);background:var(--bg);
+}
+.stat-box label{
+  font-size:9px;text-transform:uppercase;
+  letter-spacing:1px;color:var(--ink2);display:block;margin-bottom:3px;
+}
+.stat-box span{font-family:'IBM Plex Mono',monospace;font-size:15px;}
+.green{color:var(--green)}
+.amber{color:var(--amber)}
+.red{color:var(--red)}
+
+.saldo-row{display:flex;gap:8px;margin-bottom:8px;}
+.saldo-row input{
+  flex:1;border:1.5px solid var(--line);border-radius:10px;
+  padding:10px 12px;font-family:'IBM Plex Mono',monospace;
+  font-size:13px;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;
+}
+.saldo-row input:focus{border-color:var(--ink)}
+.btn-upd{
+  padding:10px 16px;background:var(--ink);color:var(--white);
+  border:none;border-radius:10px;font-family:'Outfit',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;
+}
+.btn-upd:active{opacity:.8}
+
+.btn-row{display:flex;gap:6px;}
+.btn-edit,.btn-del{
+  flex:1;padding:9px;border-radius:10px;
+  font-family:'Outfit',sans-serif;font-size:12px;font-weight:500;
+  cursor:pointer;border:1.5px solid var(--line);
+  background:transparent;color:var(--ink2);
+}
+.btn-del{color:var(--red);border-color:var(--red-bg)}
+.btn-edit:active,.btn-del:active{opacity:.7}
+
+.fab{
+  position:fixed;bottom:24px;right:20px;
+  width:54px;height:54px;
+  background:var(--ink);color:var(--white);
+  border:none;border-radius:16px;font-size:24px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .15s;
+}
+.fab:active{transform:scale(.94)}
+
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  z-index:100;align-items:flex-end;justify-content:center;
+}
+.overlay.open{display:flex}
+.modal{
+  background:var(--white);border-radius:20px 20px 0 0;
+  padding:24px 18px 40px;width:100%;max-width:480px;
+  animation:slideUp .22s ease;
+}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal h2{font-family:'Playfair Display',serif;font-size:20px;margin-bottom:18px;}
+.fg{margin-bottom:12px}
+.fg label{
+  font-size:10px;text-transform:uppercase;letter-spacing:1px;
+  color:var(--ink2);display:block;margin-bottom:5px;
+}
+.fg input{
+  width:100%;border:1.5px solid var(--line);border-radius:10px;
+  padding:11px 13px;font-family:'IBM Plex Mono',monospace;
+  font-size:13px;color:var(--ink);background:var(--white);
+  outline:none;transition:border-color .15s;
+}
+.fg input:focus{border-color:var(--ink)}
+.fg-row{display:flex;gap:8px;}
+.fg-row .fg{flex:1}
+.btn-save{
+  width:100%;padding:13px;
+  background:var(--ink);color:var(--white);
+  border:none;border-radius:12px;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;margin-top:4px;
+}
+.btn-save:active{opacity:.8}
+.btn-cancel2{
+  width:100%;padding:11px;margin-top:6px;
+  background:transparent;color:var(--ink2);
+  border:1.5px solid var(--line);border-radius:12px;
+  font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;
+}
+
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--ink2);font-size:14px;
+}
+.empty-state div{font-size:40px;margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-left">
+    <h1>Mis Tarjetas</h1>
+    <p id="hdr-date">—</p>
+  </div>
+  <div class="hdr-right" id="hdr-totals">—</div>
+</div>
+
+<div class="summary" id="summary" style="display:none">
+  <div class="sum-cell">
+    <label>Usado</label>
+    <span id="s-used">$0</span>
+  </div>
+  <div class="sum-cell">
+    <label>Disponible</label>
+    <span id="s-avail" class="green">$0</span>
+  </div>
+  <div class="sum-cell">
+    <label>Límite total</label>
+    <span id="s-limit">$0</span>
+  </div>
+</div>
+
+<div class="cards-list" id="cards-list">
+  <div class="empty-state" id="empty-state">
+    <div>💳</div>Agrega tu primera tarjeta
+  </div>
+</div>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="overlay" id="overlay" onclick="closeOut(event)">
+  <div class="modal">
+    <h2 id="mtitle">Nueva Tarjeta</h2>
+    <div class="fg"><label>Nombre</label><input id="fn" placeholder="ej. Nu Bank"></div>
+    <div class="fg"><label>Crédito total</label><input type="number" id="fc" placeholder="25000"></div>
+    <div class="fg"><label>Saldo usado</label><input type="number" id="fs" placeholder="0"></div>
+    <div class="fg-row">
+      <div class="fg"><label>Día de corte</label><input type="number" id="fco" placeholder="18" min="1" max="31"></div>
+      <div class="fg"><label>Límite de pago</label><input type="number" id="fp" placeholder="8" min="1" max="31"></div>
+    </div>
+    <div class="fg"><label>% pago mínimo</label><input type="number" id="fpct" placeholder="20" min="1" max="100"></div>
+    <button class="btn-save" onclick="saveCard()">Guardar</button>
+    <button class="btn-cancel2" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+const SK = 'tarjetas_v2';
+let cards = JSON.parse(localStorage.getItem(SK) || '[]');
+let editId = null, openId = null;
+
+const BANDS = ['#1a7a4a','#8b5cf6','#e85d04','#0369a1','#be123c'];
+
+function ensureDefaults() {
+  const names = cards.map(c => c.nombre);
+  if (!names.includes('Rappi Card'))
+    cards.push({ id:uid(), nombre:'Rappi Card', credito:5000,  saldo:0, corte:6,  pago:26, pct:20 });
+  if (!names.includes('Nu Bank'))
+    cards.push({ id:uid(), nombre:'Nu Bank',    credito:25000, saldo:0, corte:18, pago:8,  pct:20 });
+  save();
+}
+
+function uid(){ return Date.now() + Math.floor(Math.random()*9999); }
+function save(){ localStorage.setItem(SK, JSON.stringify(cards)); }
+function fmt(n){ return '$' + Number(n).toLocaleString('es-MX'); }
+
+function daysUntil(day) {
+  const now = new Date(), d = now.getDate();
+  if (day > d) return day - d;
+  if (day === d) return 0;
+  const next = new Date(now.getFullYear(), now.getMonth()+1, day);
+  return Math.round((next - now)/86400000);
+}
+
+function chipClass(days) {
+  if (days <= 2) return 'red';
+  if (days <= 5) return 'amber';
+  return '';
+}
+
+function badgeClass(days) {
+  if (days === 0) return 'now';
+  if (days <= 5) return 'soon';
+  return 'ok';
+}
+
+function badgeText(days) {
+  if (days === 0) return '¡Hoy!';
+  return days + 'd';
+}
+
+function buildPayPlan(c) {
+  if (c.saldo <= 0) {
+    return '<div class="section-label">Plan de pagos</div>'
+      + '<div class="pay-steps"><div class="pay-step">'
+      + '<div class="ps-num grey">&#10003;</div>'
+      + '<div class="ps-body"><div class="ps-action green">Sin saldo pendiente</div></div>'
+      + '</div></div>';
+  }
+  var antes = c.corte - 1 <= 0 ? 28 : c.corte - 1;
+  var despues = c.corte + 1 > 31 ? 1 : c.corte + 1;
+  var meta80 = Math.round(c.credito * 0.8);
+  var parcial = Math.max(0, c.saldo - meta80);
+  var resto = Math.min(c.saldo, meta80);
+  var d1 = daysUntil(antes), d2 = daysUntil(despues);
+  var b1 = badgeClass(d1), b2 = badgeClass(d2);
+  var html = '<div class="section-label">Plan de pagos</div><div class="pay-steps">';
+  if (parcial > 0) {
+    html += '<div class="pay-step">'
+      + '<div class="ps-num amber">1</div>'
+      + '<div class="ps-body">'
+      + '<div class="ps-date">Dia ' + antes + ' &mdash; 1 dia antes del corte</div>'
+      + '<div class="ps-action">Pago parcial &rarr; bajar al 80%</div>'
+      + '<div class="ps-amount amber">' + fmt(parcial) + '</div>'
+      + '</div>'
+      + '<span class="ps-badge ' + b1 + '">' + badgeText(d1) + '</span>'
+      + '</div>';
+  } else {
+    html += '<div class="pay-step">'
+      + '<div class="ps-num grey">1</div>'
+      + '<div class="ps-body">'
+      + '<div class="ps-date">Dia ' + antes + ' &mdash; 1 dia antes del corte</div>'
+      + '<div class="ps-action green">Ya estas en 80% o menos</div>'
+      + '<div class="ps-amount" style="color:var(--ink2)">Sin pago requerido</div>'
+      + '</div>'
+      + '<span class="ps-badge ' + b1 + '">' + badgeText(d1) + '</span>'
+      + '</div>';
+  }
+  html += '<div class="pay-step">'
+    + '<div class="ps-num green">2</div>'
+    + '<div class="ps-body">'
+    + '<div class="ps-date">Dia ' + despues + ' &mdash; 1 dia despues del corte</div>'
+    + '<div class="ps-action">Liquidar todo</div>'
+    + '<div class="ps-amount green">' + fmt(parcial > 0 ? resto : c.saldo) + '</div>'
+    + '</div>'
+    + '<span class="ps-badge ' + b2 + '">' + badgeText(d2) + '</span>'
+    + '</div>';
+  html += '</div>';
+  return html;
+}
+
+function render() {
+  const now = new Date();
+  document.getElementById('hdr-date').textContent =
+    now.toLocaleDateString('es-MX',{weekday:'short',day:'2-digit',month:'short',year:'numeric'});
+
+  const list = document.getElementById('cards-list');
+  const empty = document.getElementById('empty-state');
+
+  if (!cards.length) {
+    list.innerHTML = ''; list.appendChild(empty);
+    empty.style.display = 'block';
+    document.getElementById('summary').style.display = 'none';
+    document.getElementById('hdr-totals').textContent = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  document.getElementById('summary').style.display = 'grid';
+
+  const tu = cards.reduce((a,c) => a + +c.saldo, 0);
+  const tl = cards.reduce((a,c) => a + +c.credito, 0);
+  document.getElementById('s-used').textContent = fmt(tu);
+  document.getElementById('s-avail').textContent = fmt(tl - tu);
+  document.getElementById('s-limit').textContent = fmt(tl);
+  document.getElementById('hdr-totals').textContent = cards.length + ' tarjeta' + (cards.length>1?'s':'');
+
+  list.innerHTML = '';
+  cards.forEach((c, idx) => {
+    const pct = c.credito ? Math.min(100, Math.round(c.saldo / c.credito * 100)) : 0;
+    const avail = c.credito - c.saldo;
+    const dcD = daysUntil(c.corte), pdD = daysUntil(c.pago);
+    const isOpen = openId === c.id;
+    const color = BANDS[idx % BANDS.length];
+    const barColor = pct < 50 ? 'var(--green)' : pct < 80 ? 'var(--amber)' : 'var(--red)';
+    const usedColor = pct < 50 ? 'green' : pct < 80 ? 'amber' : 'red';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'card-wrap';
+    wrap.style.animationDelay = (idx * 0.06) + 's';
+    wrap.innerHTML = `
+      <div class="card ${isOpen ? 'open' : ''}" onclick="toggle(${c.id})">
+        <div class="card-band" style="background:${color}"></div>
+        <div class="card-head">
+          <div class="card-name">${c.nombre}</div>
+          <span class="card-chevron">&#8964;</span>
+        </div>
+        <div class="card-amounts">
+          <div class="amt-block">
+            <div class="amt-label">Utilizado</div>
+            <span class="used-amt ${usedColor}">${fmt(c.saldo)}</span>
+          </div>
+          <div class="amt-divider"></div>
+          <div class="amt-block">
+            <div class="amt-label">Disponible</div>
+            <span class="used-amt green">${fmt(avail)}</span>
+          </div>
+          <div class="amt-block amt-right">
+            <div class="amt-label">Limite</div>
+            <span class="limit-amt">${fmt(c.credito)}</span>
+          </div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${barColor}"></div>
+            <div class="bar-tick" style="left:${c.pct}%">
+              <div class="bar-tick-label">${c.pct}%</div>
+            </div>
+          </div>
+        </div>
+        <div class="pago-banner ${c.saldo <= 0 ? 'zero' : ''}">
+          <div class="pago-banner-left">
+            <span class="pago-banner-label">${c.saldo <= 0 ? 'Sin saldo' : 'Pago minimo (' + c.pct + '%)'}</span>
+            <span class="pago-banner-amt">${fmt(Math.round(c.saldo * c.pct / 100))}</span>
+          </div>
+          <span class="pago-banner-pct">${c.saldo <= 0 ? 'Al corriente' : 'antes del dia ' + (c.corte - 1 <= 0 ? 28 : c.corte - 1)}</span>
+        </div>
+        <div class="chip-row">
+          <span class="chip ${chipClass(dcD)}">Corte: ${dcD === 0 ? 'hoy' : 'dia ' + c.corte + ' (' + dcD + 'd)'}</span>
+          <span class="chip ${chipClass(pdD)}">Pago: ${pdD === 0 ? 'hoy' : 'dia ' + c.pago + ' (' + pdD + 'd)'}</span>
+          <span class="chip">${pct}% usado</span>
+        </div>
+      </div>
+      <div class="detail ${isOpen ? 'open' : ''}" id="det-${c.id}" onclick="event.stopPropagation()">
+        ${buildPayPlan(c)}
+        <div class="stats-grid" style="margin-top:12px">
+          <div class="stat-box"><label>Disponible</label><span class="green">${fmt(avail)}</span></div>
+          <div class="stat-box"><label>Meta 80%</label><span class="amber">${fmt(Math.round(c.credito*.8))}</span></div>
+          <div class="stat-box"><label>Dias corte</label><span class="${chipClass(dcD) || 'green'}">${dcD === 0 ? 'Hoy' : dcD + 'd'}</span></div>
+          <div class="stat-box"><label>Dias pago</label><span class="${chipClass(pdD) || 'green'}">${pdD === 0 ? 'Hoy' : pdD + 'd'}</span></div>
+        </div>
+        <div class="saldo-row">
+          <input type="number" id="ns-${c.id}" value="${c.saldo}" placeholder="Nuevo saldo">
+          <button class="btn-upd" onclick="updSaldo(${c.id})">Actualizar</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-edit" onclick="editCard(${c.id})">&#9998; Editar</button>
+          <button class="btn-del" onclick="delCard(${c.id})">&#128465; Eliminar</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(wrap);
+  });
+}
+
+function toggle(id) { openId = openId === id ? null : id; render(); }
+function updSaldo(id) {
+  const v = document.getElementById('ns-' + id).value;
+  const c = cards.find(x => x.id === id);
+  if (c && v !== '') { c.saldo = parseFloat(v)||0; save(); render(); }
+}
+
+function openModal(id = null) {
+  editId = id;
+  const c = id ? cards.find(x => x.id === id) : null;
+  document.getElementById('mtitle').textContent = c ? 'Editar tarjeta' : 'Nueva tarjeta';
+  document.getElementById('fn').value  = c ? c.nombre  : '';
+  document.getElementById('fc').value  = c ? c.credito : '';
+  document.getElementById('fs').value  = c ? c.saldo   : '';
+  document.getElementById('fco').value = c ? c.corte   : '';
+  document.getElementById('fp').value  = c ? c.pago    : '';
+  document.getElementById('fpct').value= c ? c.pct     : '20';
+  document.getElementById('overlay').classList.add('open');
+}
+function editCard(id) { openModal(id); }
+function closeModal() { document.getElementById('overlay').classList.remove('open'); editId = null; }
+function closeOut(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+
+function saveCard() {
+  const nombre  = document.getElementById('fn').value.trim();
+  const credito = parseFloat(document.getElementById('fc').value)||0;
+  const saldo   = parseFloat(document.getElementById('fs').value)||0;
+  const corte   = parseInt(document.getElementById('fco').value)||1;
+  const pago    = parseInt(document.getElementById('fp').value)||1;
+  const pct     = parseFloat(document.getElementById('fpct').value)||20;
+  if (!nombre || !credito) return;
+  if (editId) {
+    Object.assign(cards.find(x => x.id === editId), {nombre,credito,saldo,corte,pago,pct});
+  } else {
+    cards.push({id:uid(),nombre,credito,saldo,corte,pago,pct});
+  }
+  save(); closeModal(); render();
+}
+
+function delCard(id) {
+  if (!confirm('Eliminar tarjeta?')) return;
+  cards = cards.filter(x => x.id !== id);
+  openId = null; save(); render();
+}
+
+ensureDefaults();
+render();
+</script>
+</body>
+</html>
