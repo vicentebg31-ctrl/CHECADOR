@@ -539,7 +539,8 @@ async function iniciarApp() {
       if (d.ESTANTES)    ESTANTES    = d.ESTANTES;
     }
     setSync('ok');
-    document.getElementById('loading-overlay').style.display = 'none';
+    const lo = document.getElementById('loading-overlay');
+    if (lo) lo.style.display = 'none';
     if (sesion.esAdmin) {
       configurarAdmin();
     } else {
@@ -1065,15 +1066,20 @@ window.adminEliminarEmpleado = async function(id) {
 
 // ── INICIO ────────────────────────────────────────────────────────────
 async function arrancar() {
+  // Limpiar sesion vieja del sistema anterior si existe
+  const savedOld = localStorage.getItem('checador_data');
+  // Solo limpiar si la sesion guardada no tiene la estructura correcta
   const saved = localStorage.getItem('pedido_sesion');
   if (saved) {
     try {
       const s = JSON.parse(saved);
-      if (s.esAdmin) {
+      // Validar que la sesión tenga la estructura correcta
+      if (!s || typeof s !== 'object' || !s.id) throw new Error('Sesión inválida');
+      if (s.esAdmin && s.id === 'admin') {
         sesion = s;
         iniciarApp();
         return;
-      } else {
+      } else if (!s.esAdmin && s.id) {
         const empDoc = await getDoc(doc(db, EMPLEADOS_COL, s.id));
         if (empDoc.exists()) {
           sesion = { id:s.id, nombre:empDoc.data().nombre, estanteId:empDoc.data().estanteId||null, esAdmin:false };
@@ -1081,15 +1087,20 @@ async function arrancar() {
           return;
         }
       }
-    } catch(e) {}
+    } catch(e) {
+      console.log('Sesión inválida, mostrando login');
+    }
     localStorage.removeItem('pedido_sesion');
   }
   document.getElementById('loading-overlay').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
 }
 
-arrancar().catch(() => {
+arrancar().catch(e => {
+  console.error('Error arrancar:', e);
   document.getElementById('loading-overlay').style.display = 'none';
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-login').classList.add('active');
 });
 </script>
