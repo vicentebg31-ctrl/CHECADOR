@@ -79,6 +79,9 @@
   .admin-emp-pass { color: var(--mid); font-size: 11px; }
   .admin-emp-estante { font-size: 11px; color: var(--accent2); font-weight: 700; }
   .admin-del-btn { background: transparent; border: 1px solid #ddd; border-radius: 6px; padding: 3px 8px; color: var(--accent); font-size: 11px; font-weight: 700; cursor: pointer; }
+  .perm-btn { border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+  .perm-on  { background: #d5f5e3; color: #1d6a3a; }
+  .perm-off { background: #f2f3f4; color: #5d6d7e; }
   .add-field { margin-bottom: 10px; }
   .add-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mid); margin-bottom: 5px; display: block; }
   .add-input { width: 100%; height: 40px; border: 1.5px solid var(--border); border-radius: 8px; padding: 0 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--dark); background: var(--bg); outline: none; }
@@ -295,12 +298,6 @@
             <label class="add-label">Contraseña</label>
             <input class="add-input" id="admin-new-pass" type="text" placeholder="Contraseña">
           </div>
-          <div class="add-field">
-            <label class="add-label">Estante asignado</label>
-            <select class="add-input" id="admin-new-estante" style="cursor:pointer">
-              <option value="">— Sin asignar —</option>
-            </select>
-          </div>
           <button class="add-btn" onclick="adminAgregarEmpleado()">Agregar empleado</button>
           <div id="admin-emp-msg"></div>
         </div>
@@ -502,7 +499,7 @@ window.doLogin = async function() {
     let found = null;
     snap.forEach(d => { if (d.data().pass === pass) found = { id: d.id, ...d.data() }; });
     if (found) {
-      sesion = { id: found.id, nombre: found.nombre, estanteId: found.estanteId || null, esAdmin: false };
+      sesion = { id: found.id, nombre: found.nombre, esAdmin: false, puedeEditar: found.puedeEditar === true };
       localStorage.setItem('pedido_sesion', JSON.stringify(sesion));
       document.getElementById('login-pass').value = '';
       iniciarApp();
@@ -571,15 +568,13 @@ async function iniciarApp() {
 
 // ── EMPLEADO ─────────────────────────────────────────────────────────
 function configurarEmpleado() {
-  // Si tiene estante asignado, fijarlo; si no, mostrar todos
-  if (sesion.estanteId && ESTANTES[sesion.estanteId]) {
-    estanteActivo = sesion.estanteId;
-    document.getElementById('tabs-estante').style.display = 'none';
-  } else {
-    estanteActivo = Object.keys(ESTANTES)[0];
-    document.getElementById('tabs-estante').style.display = 'flex';
-    renderTabs(false); // sin botón de agregar
-  }
+  // Empleado ve todos los estantes
+  estanteActivo = Object.keys(ESTANTES)[0];
+  document.getElementById('tabs-estante').style.display = 'flex';
+  // Mostrar/ocultar edición según permiso
+  const puedeEditar = sesion.puedeEditar === true;
+  document.getElementById('add-product-card').style.display = puedeEditar ? 'block' : 'none';
+  renderTabs(false);
 
   // Nav sin admin
   document.getElementById('bottom-nav').innerHTML = `
@@ -653,7 +648,7 @@ window.cambiarVista = function(vista) {
   tabs.style.display = vista==='productos' ? 'flex' : 'none';
   if (vista==='resumen')     renderResumen();
   if (vista==='proveedores') renderProveedores();
-  if (vista==='admin')       { renderAdminEmpleados(); renderAdminPedidoGlobal(); cargarEstantesSelector(); }
+  if (vista==='admin')       { renderAdminEmpleados(); renderAdminPedidoGlobal(); }
 };
 
 // ── TABS ─────────────────────────────────────────────────────────────
@@ -983,11 +978,10 @@ async function renderAdminEmpleados() {
   if (!emps.length) { lista.innerHTML='<div style="color:var(--mid);font-size:13px;padding:8px 0">No hay empleados.</div>'; return; }
 
   lista.innerHTML = emps.map(emp => {
-    const estNombre = emp.estanteId && ESTANTES[emp.estanteId] ? ESTANTES[emp.estanteId].label : 'Sin asignar';
     return '<div class="admin-emp-row">' +
       '<div>' +
         '<div class="admin-emp-name">'+emp.nombre+'</div>' +
-        '<div class="admin-emp-pass">🔑 '+emp.pass+' &nbsp;·&nbsp; <span class="admin-emp-estante">'+estNombre+'</span></div>' +
+        '<div class="admin-emp-pass">🔑 '+emp.pass+'</div>' +
       '</div>' +
       '<button class="admin-del-btn" onclick="adminEliminarEmpleado(\''+emp.id+'\')">Eliminar</button>' +
     '</div>';
@@ -1027,17 +1021,12 @@ function renderAdminPedidoGlobal() {
   ).join('');
 }
 
-async function cargarEstantesSelector() {
-  const sel = document.getElementById('admin-new-estante');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">— Sin asignar —</option>' +
-    Object.keys(ESTANTES).map(ek => '<option value="'+ek+'">'+ESTANTES[ek].label+'</option>').join('');
-}
+
 
 window.adminAgregarEmpleado = async function() {
   const nombre    = document.getElementById('admin-new-nombre').value.trim();
   const pass      = document.getElementById('admin-new-pass').value.trim();
-  const estanteId = document.getElementById('admin-new-estante').value;
+
   const msg       = document.getElementById('admin-emp-msg');
   msg.textContent = ''; msg.className = '';
 
@@ -1050,16 +1039,23 @@ window.adminAgregarEmpleado = async function() {
   if (dup) { msg.textContent='Esa contraseña ya está en uso.'; msg.className='msg-err'; return; }
 
   try {
-    await addDoc(collection(db, EMPLEADOS_COL), { nombre, pass, estanteId: estanteId||'', creadoEn: Date.now() });
+    await addDoc(collection(db, EMPLEADOS_COL), { nombre, pass, puedeEditar: false, creadoEn: Date.now() });
     document.getElementById('admin-new-nombre').value = '';
     document.getElementById('admin-new-pass').value   = '';
-    document.getElementById('admin-new-estante').value = '';
+
     msg.textContent = '✅ Empleado agregado.'; msg.className='msg-ok';
     setTimeout(()=>{ msg.textContent=''; }, 2500);
     renderAdminEmpleados();
   } catch(e) {
     msg.textContent='Error al guardar.'; msg.className='msg-err';
   }
+};
+
+window.togglePermiso = async function(id, actual) {
+  try {
+    await setDoc(doc(db, EMPLEADOS_COL, id), { puedeEditar: !actual }, { merge: true });
+    renderAdminEmpleados();
+  } catch(e) { alert('Error al cambiar permiso.'); }
 };
 
 window.adminEliminarEmpleado = async function(id) {
@@ -1088,7 +1084,7 @@ async function arrancar() {
       } else if (!s.esAdmin && s.id) {
         const empDoc = await getDoc(doc(db, EMPLEADOS_COL, s.id));
         if (empDoc.exists()) {
-          sesion = { id:s.id, nombre:empDoc.data().nombre, estanteId:empDoc.data().estanteId||null, esAdmin:false };
+          sesion = { id:s.id, nombre:empDoc.data().nombre, esAdmin:false, puedeEditar: empDoc.data().puedeEditar===true };
           iniciarApp();
           return;
         }
