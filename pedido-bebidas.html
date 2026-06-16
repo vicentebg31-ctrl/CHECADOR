@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido Bebidas</title>
+<style>
+  :root{
+    --bg:#0d1b2a;
+    --card:#16263a;
+    --line:#243b54;
+    --txt:#eaf2fb;
+    --muted:#8aa4c0;
+    --bien:#2ecc71;
+    --pedir:#f1c40f;
+    --agotado:#e74c3c;
+    --accent:#38bdf8;
+  }
+  body.clamato{
+    --bg:#2a0f0f;--card:#3a1717;--line:#54231f;
+    --txt:#fbeaea;--muted:#c08a8a;--accent:#ff6b4a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding-bottom:90px;transition:background .2s;
+  }
+  .tabs{
+    position:sticky;top:0;z-index:20;display:flex;
+    background:var(--bg);border-bottom:1px solid var(--line);
+  }
+  .tab{
+    flex:1;padding:14px 8px;text-align:center;font-size:15px;font-weight:600;
+    color:var(--muted);background:transparent;border:none;cursor:pointer;
+    border-bottom:3px solid transparent;
+  }
+  .tab.active{color:var(--txt);border-bottom-color:var(--accent)}
+  header{
+    position:sticky;top:50px;z-index:10;
+    background:var(--bg);border-bottom:1px solid var(--line);
+    padding:12px 16px 10px;
+  }
+  h1{margin:0;font-size:18px;display:flex;align-items:center;gap:8px}
+  .sub{color:var(--muted);font-size:12px;margin-top:2px}
+  .counter{display:flex;gap:8px;margin-top:10px;font-size:12px}
+  .pill{
+    flex:1;text-align:center;background:var(--card);
+    border:1px solid var(--line);border-radius:10px;padding:6px 4px;
+  }
+  .pill b{display:block;font-size:17px}
+  .pill.bien b{color:var(--bien)}
+  .pill.pedir b{color:var(--pedir)}
+  .pill.agotado b{color:var(--agotado)}
+  main{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:14px;
+  }
+  .card.is-pedir{border-color:var(--pedir)}
+  .card.is-agotado{border-color:var(--agotado)}
+  .name{font-size:16px;font-weight:600;margin-bottom:2px}
+  .ml{color:var(--muted);font-size:12px;margin-bottom:12px}
+  .states{display:flex;gap:8px;margin-bottom:12px}
+  .st{
+    flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--line);
+    background:transparent;color:var(--muted);font-size:13px;font-weight:600;
+    cursor:pointer;transition:.15s;
+  }
+  .st.active.bien{background:var(--bien);color:#06351b;border-color:var(--bien)}
+  .st.active.pedir{background:var(--pedir);color:#3d3100;border-color:var(--pedir)}
+  .st.active.agotado{background:var(--agotado);color:#3d0c08;border-color:var(--agotado)}
+  .qty{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .qty span{color:var(--muted);font-size:13px}
+  .stepper{display:flex;align-items:center;gap:14px}
+  .stepper button{
+    width:42px;height:42px;border-radius:12px;border:1px solid var(--line);
+    background:var(--bg);color:var(--txt);font-size:22px;cursor:pointer;
+  }
+  .stepper button:active{background:var(--accent);color:var(--bg)}
+  .stepper .val{font-size:20px;font-weight:700;min-width:32px;text-align:center}
+  footer{
+    position:fixed;bottom:0;left:0;right:0;
+    background:var(--bg);border-top:1px solid var(--line);
+    padding:12px 16px;display:flex;gap:10px;
+  }
+  .wa{
+    flex:1;background:#25d366;color:#04331a;border:none;border-radius:12px;
+    padding:14px;font-size:16px;font-weight:700;cursor:pointer;
+  }
+  .reset{
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    border-radius:12px;padding:14px 18px;font-size:16px;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tab active" id="tab-electrolit" onclick="cambiar('electrolit')">⚡ Electrolit</button>
+  <button class="tab" id="tab-clamato" onclick="cambiar('clamato')">🍅 Clamato</button>
+  <button class="tab" id="tab-abarrotera" onclick="cambiar('abarrotera')">🥫 Abarrotera</button>
+  <button class="tab" id="tab-jumex" onclick="cambiar('jumex')">🧃 Jumex</button>
+</div>
+
+<header>
+  <h1 id="titulo">⚡ Pedido Electrolit</h1>
+  <div class="sub">Marca estado y cantidad por producto</div>
+  <div class="counter">
+    <div class="pill bien">Bien <b id="cBien">0</b></div>
+    <div class="pill pedir">Pedir <b id="cPedir">0</b></div>
+    <div class="pill agotado">Agotado <b id="cAgotado">0</b></div>
+    <div class="pill">Piezas <b id="cPz">0</b></div>
+  </div>
+</header>
+
+<main id="list"></main>
+
+<footer>
+  <button class="wa" onclick="enviar()">📲 WhatsApp</button>
+  <button class="reset" onclick="reset()">↺</button>
+</footer>
+
+<script>
+const CATALOGO = {
+  electrolit: {
+    titulo: '⚡ Pedido Electrolit',
+    encabezado: 'PEDIDO ELECTROLIT',
+    items: [
+      {id:'limon', nombre:'Electrolit Limón',     ml:'625 ml'},
+      {id:'mora',  nombre:'Electrolit Mora Azul', ml:'625 ml'},
+      {id:'fresa', nombre:'Electrolit Fresa',     ml:'625 ml'},
+      {id:'uva',   nombre:'Electrolit Uva',       ml:'625 ml'},
+    ]
+  },
+  clamato: {
+    titulo: '🍅 Pedido Clamato Peñafiel',
+    encabezado: 'PEDIDO CLAMATO PEÑAFIEL',
+    items: [
+      {id:'orig946', nombre:'Clamato Original', ml:'946 ml'},
+      {id:'cuba946', nombre:'Clamato Cubano',   ml:'946 ml'},
+      {id:'orig473', nombre:'Clamato Original', ml:'473 ml'},
+      {id:'cuba473', nombre:'Clamato Cubano',   ml:'473 ml'},
+      {id:'orig296', nombre:'Clamato Original', ml:'296 ml'},
+      {id:'cuba296', nombre:'Clamato Cubano',   ml:'296 ml'},
+    ]
+  },
+  abarrotera: {
+    titulo: '🥫 Pedido Abarrotera',
+    encabezado: 'PEDIDO ABARROTERA',
+    items: [
+      {id:'ker950', nombre:'Kermato', ml:'950 ml'},
+      {id:'ker413', nombre:'Kermato', ml:'413 ml'},
+      {id:'ker245', nombre:'Kermato', ml:'245 ml'},
+      {id:'v8lata', nombre:'V8 Lata', ml:'340 ml'},
+      {id:'ampblue', nombre:'Amper Blueberry',    ml:'473 ml'},
+      {id:'ampkal',  nombre:'Amper Kalaka Punch', ml:'473 ml'},
+      {id:'ampene',  nombre:'Amper Energy Drink', ml:'473 ml'},
+    ]
+  },
+  jumex: {
+    titulo: '🧃 Pedido Jumex',
+    encabezado: 'PEDIDO JUMEX',
+    items: [
+      {id:'bida500uva', nombre:'Jumex Bida Uva',     ml:'500 ml'},
+      {id:'bida250uva', nombre:'Jumex Bida Uva',     ml:'250 ml'},
+      {id:'bida500fre', nombre:'Jumex Bida Fresa',   ml:'500 ml'},
+      {id:'bida250fre', nombre:'Jumex Bida Fresa',   ml:'250 ml'},
+      {id:'bida500man', nombre:'Jumex Bida Manzana', ml:'500 ml'},
+      {id:'bida250man', nombre:'Jumex Bida Manzana', ml:'250 ml'},
+      {id:'man413',     nombre:'Jumex Manzana',      ml:'413 ml'},
+      {id:'mango413',   nombre:'Jumex Mango',        ml:'413 ml'},
+      {id:'dur413',     nombre:'Jumex Durazno',      ml:'413 ml'},
+      {id:'dur237',     nombre:'Jumex Durazno',      ml:'237 ml'},
+      {id:'man237',     nombre:'Jumex Manzana',      ml:'237 ml'},
+      {id:'pina960',    nombre:'Jumex Piña',         ml:'960 ml'},
+      {id:'nar960',     nombre:'Jumex Naranja',      ml:'960 ml'},
+      {id:'man960',     nombre:'Jumex Manzana',      ml:'960 ml'},
+      {id:'mango960',   nombre:'Jumex Mango',        ml:'960 ml'},
+    ]
+  }
+};
+
+let actual = 'electrolit';
+const estado = {};
+Object.keys(CATALOGO).forEach(cat => {
+  estado[cat] = {};
+  CATALOGO[cat].items.forEach(s => estado[cat][s.id] = {st:null, qty:0});
+});
+
+const list = document.getElementById('list');
+
+function cambiar(cat){
+  actual = cat;
+  document.body.classList.toggle('clamato', cat === 'clamato');
+  ['electrolit','clamato','abarrotera','jumex'].forEach(c => {
+    document.getElementById('tab-'+c).classList.toggle('active', c === cat);
+  });
+  document.getElementById('titulo').textContent = CATALOGO[cat].titulo;
+  render();
+}
+
+function render(){
+  list.innerHTML = '';
+  CATALOGO[actual].items.forEach(s => {
+    const e = estado[actual][s.id];
+    const cls = e.st === 'pedir' ? 'is-pedir' : e.st === 'agotado' ? 'is-agotado' : '';
+    const card = document.createElement('div');
+    card.className = 'card ' + cls;
+    card.innerHTML = `
+      <div class="name">${s.nombre}</div>
+      <div class="ml">${s.ml}</div>
+      <div class="states">
+        <button class="st bien ${e.st==='bien'?'active':''}"       onclick="setSt('${s.id}','bien')">Bien</button>
+        <button class="st pedir ${e.st==='pedir'?'active':''}"     onclick="setSt('${s.id}','pedir')">Pedir</button>
+        <button class="st agotado ${e.st==='agotado'?'active':''}" onclick="setSt('${s.id}','agotado')">Agotado</button>
+      </div>
+      <div class="qty">
+        <span>Cantidad a pedir</span>
+        <div class="stepper">
+          <button onclick="setQty('${s.id}',-1)">−</button>
+          <span class="val">${e.qty}</span>
+          <button onclick="setQty('${s.id}',1)">+</button>
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+  contar();
+}
+
+function setSt(id, st){
+  const e = estado[actual][id];
+  e.st = e.st === st ? null : st;
+  render();
+}
+function setQty(id, d){
+  const e = estado[actual][id];
+  e.qty = Math.max(0, e.qty + d);
+  if(e.qty > 0 && e.st === null) e.st = 'pedir';
+  render();
+}
+function contar(){
+  let b=0,p=0,a=0,pz=0;
+  CATALOGO[actual].items.forEach(s=>{
+    const e=estado[actual][s.id];
+    if(e.st==='bien')b++;
+    if(e.st==='pedir')p++;
+    if(e.st==='agotado')a++;
+    pz+=e.qty;
+  });
+  document.getElementById('cBien').textContent=b;
+  document.getElementById('cPedir').textContent=p;
+  document.getElementById('cAgotado').textContent=a;
+  document.getElementById('cPz').textContent=pz;
+}
+function reset(){
+  if(!confirm('¿Borrar el pedido de '+CATALOGO[actual].titulo.replace(/^[^ ]+ /,'')+'?'))return;
+  CATALOGO[actual].items.forEach(s=>estado[actual][s.id]={st:null,qty:0});
+  render();
+}
+function enviar(){
+  const cat = CATALOGO[actual];
+  const lineas = cat.items
+    .filter(s => estado[actual][s.id].qty > 0 || estado[actual][s.id].st === 'agotado')
+    .map(s => {
+      const e = estado[actual][s.id];
+      const cant = e.qty > 0 ? e.qty + ' pz' : 'AGOTADO';
+      return '• ' + s.nombre + ' ' + s.ml + ' — ' + cant;
+    });
+  if(lineas.length === 0){ alert('No hay nada que pedir en esta pestaña.'); return; }
+  const fecha = new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'short'});
+  const msg = '*' + cat.encabezado + '* (' + fecha + ')\n\n' + lineas.join('\n');
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+render();
+</script>
+</body>
+</html>
