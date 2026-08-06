@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Facturas</title>
+<style>
+  :root{
+    --bg: #12161c;
+    --card: #1b212a;
+    --card-hover: #212834;
+    --line: #2a323d;
+    --text: #eef1f5;
+    --muted: #8b95a3;
+    --accent: #e0a02c;
+    --ok: #3fae6a;
+    --warn: #e0a02c;
+    --danger: #d9534f;
+    --danger-bg: rgba(217,83,79,0.12);
+    --warn-bg: rgba(224,160,44,0.12);
+    --ok-bg: rgba(63,174,106,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding-bottom:100px;
+  }
+  header{
+    padding:20px 16px 14px;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    background:var(--bg);
+    z-index:10;
+  }
+  .header-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+  }
+  header h1{margin:0;font-size:20px;letter-spacing:0.3px;}
+  header p{margin:4px 0 0;color:var(--muted);font-size:13px;}
+  .icon-btn{
+    background:var(--card);
+    border:1px solid var(--line);
+    color:var(--text);
+    width:38px;height:38px;
+    border-radius:10px;font-size:16px;cursor:pointer;flex-shrink:0;
+  }
+  .search-bar{margin:12px 16px 0;}
+  .search-bar input{
+    width:100%;background:var(--card);border:1px solid var(--line);
+    color:var(--text);padding:10px 12px;border-radius:10px;font-size:14px;
+  }
+  .summary{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;}
+  .chip{
+    flex:1;min-width:100px;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;text-align:center;
+  }
+  .chip .num{font-size:18px;font-weight:700;}
+  .chip .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+  .chip.danger .num{color:var(--danger);}
+  .chip.warn .num{color:var(--warn);}
+  .chip.ok .num{color:var(--ok);}
+  .filters{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;}
+  .filter-btn{
+    background:var(--card);border:1px solid var(--line);color:var(--muted);
+    padding:7px 14px;border-radius:999px;font-size:13px;white-space:nowrap;cursor:pointer;
+  }
+  .filter-btn.active{background:var(--accent);color:#1a1400;border-color:var(--accent);font-weight:600;}
+  .sucursal-tabs{display:flex;gap:8px;padding:10px 16px 0;overflow-x:auto;}
+  .suc-btn{
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    padding:6px 12px;border-radius:999px;font-size:12.5px;white-space:nowrap;cursor:pointer;
+  }
+  .suc-btn.active{border-color:#5b8fd6;color:#5b8fd6;background:rgba(91,143,214,0.1);font-weight:600;}
+  .actions-row{display:flex;gap:8px;padding:14px 16px 0;}
+  .action-chip{
+    flex:1;background:var(--card);border:1px solid var(--line);color:var(--text);
+    padding:10px;border-radius:12px;font-size:12.5px;text-align:center;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+  }
+  .action-chip.whatsapp{color:#25D366;border-color:rgba(37,211,102,0.35);}
+  .list{padding:14px 16px 0;display:flex;flex-direction:column;gap:10px;}
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:12px;display:flex;gap:12px;cursor:pointer;
+  }
+  .card:active{background:var(--card-hover);}
+  .thumb{
+    width:60px;height:60px;border-radius:10px;
+    background:#0e1116 center/cover no-repeat;
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);font-size:22px;border:1px solid var(--line);
+  }
+  .info{flex:1;min-width:0;}
+  .info .row1{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .info .prov{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .info .monto{font-weight:700;font-size:15px;white-space:nowrap;}
+  .info .meta{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .info .suc-tag{color:#5b8fd6;font-size:11.5px;font-weight:600;}
+  .badge-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;}
+  .badge.danger{background:var(--danger-bg);color:var(--danger);}
+  .badge.warn{background:var(--warn-bg);color:var(--warn);}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);}
+  .badge.paid{background:rgba(139,149,163,0.15);color:var(--muted);}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:14px;}
+  .fab{
+    position:fixed;bottom:22px;right:20px;width:58px;height:58px;border-radius:50%;
+    background:var(--accent);color:#1a1400;font-size:30px;border:none;
+    box-shadow:0 6px 18px rgba(224,160,44,0.4);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;
+  }
+  .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:30;display:none;}
+  .sheet-overlay.show{display:block;}
+  .sheet{
+    position:fixed;left:0;right:0;bottom:0;background:var(--bg);
+    border-top:1px solid var(--line);border-radius:20px 20px 0 0;
+    max-height:92vh;overflow-y:auto;z-index:31;
+    transform:translateY(100%);transition:transform 0.25s ease;
+    padding:16px 16px 30px;
+  }
+  .sheet.show{transform:translateY(0);}
+  .sheet-handle{width:40px;height:4px;background:var(--line);border-radius:99px;margin:0 auto 14px;}
+  .sheet h2{margin:0 0 16px;font-size:18px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+  .field input,.field select,.field textarea{
+    width:100%;background:var(--card);border:1px solid var(--line);
+    color:var(--text);padding:11px 12px;border-radius:10px;font-size:15px;font-family:inherit;
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .row2{display:flex;gap:10px;}
+  .row2 .field{flex:1;}
+  .img-upload{
+    border:1.5px dashed var(--line);border-radius:12px;padding:16px;
+    text-align:center;color:var(--muted);font-size:13px;cursor:pointer;
+    position:relative;overflow:hidden;
+  }
+  .img-upload img{max-width:100%;max-height:220px;border-radius:8px;display:block;margin:0 auto;}
+  .img-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .img-remove{display:inline-block;margin-top:8px;color:var(--danger);font-size:12.5px;cursor:pointer;}
+  .img-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(72px, 1fr));gap:8px;margin-top:10px;}
+  .img-grid-item{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+  .img-grid-item img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+  .img-grid-item .rm{
+    position:absolute;top:3px;right:3px;width:20px;height:20px;
+    background:rgba(0,0,0,0.65);color:#fff;border:none;border-radius:50%;
+    font-size:12px;line-height:1;cursor:pointer;
+  }
+  .img-count-badge{
+    position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.7);
+    color:#fff;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;
+  }
+  .viewer-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    background:rgba(255,255,255,0.1);color:#fff;border:none;
+    width:44px;height:44px;border-radius:50%;font-size:20px;
+  }
+  .viewer-nav.prev{left:14px;}
+  .viewer-nav.next{right:14px;}
+  .viewer-counter{
+    position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+    color:#fff;font-size:13px;background:rgba(255,255,255,0.15);
+    padding:4px 12px;border-radius:999px;
+  }
+  .sheet-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
+  .btn-primary{background:var(--accent);color:#1a1400;}
+  .btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--line);}
+  .btn-danger{background:var(--danger-bg);color:var(--danger);}
+  .viewer-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,0.9);
+    z-index:40;display:none;align-items:center;justify-content:center;
+  }
+  .viewer-overlay.show{display:flex;}
+  .viewer-overlay img{max-width:92%;max-height:85%;border-radius:8px;}
+  .viewer-close{
+    position:absolute;top:18px;right:18px;background:rgba(255,255,255,0.1);
+    color:#fff;border:none;width:38px;height:38px;border-radius:50%;font-size:18px;
+  }
+  .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:50;display:none;}
+  .menu-overlay.show{display:block;}
+  .menu{
+    position:fixed;right:16px;top:64px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;z-index:51;
+    overflow:hidden;min-width:200px;display:none;
+  }
+  .menu.show{display:block;}
+  .menu-item{padding:13px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .menu-item:last-child{border-bottom:none;}
+  .menu-item.danger{color:var(--danger);}
+  #importFile{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Control de Facturas</h1>
+      <p>Fecha de llegada, fecha de pago y foto de cada factura</p>
+    </div>
+    <button class="icon-btn" onclick="toggleMenu()">⋮</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Buscar proveedor, notas o número de factura..." oninput="render()">
+  </div>
+</header>
+
+<div class="summary" id="summary"></div>
+<div class="sucursal-tabs" id="sucursalTabs"></div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-f="todas">Todas</button>
+  <button class="filter-btn" data-f="pendientes">Pendientes</button>
+  <button class="filter-btn" data-f="vencidas">Vencidas</button>
+  <button class="filter-btn" data-f="pagadas">Pagadas</button>
+</div>
+
+<div class="actions-row">
+  <div class="action-chip whatsapp" onclick="shareWhatsApp()">📲 Enviar resumen</div>
+</div>
+
+<div class="list" id="list"></div>
+
+<button class="fab" onclick="openSheet()">+</button>
+
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<div class="menu" id="menu">
+  <div class="menu-item" onclick="exportBackup()">⬇️ Descargar respaldo</div>
+  <div class="menu-item" onclick="document.getElementById('importFile').click()">⬆️ Restaurar respaldo</div>
+  <div class="menu-item" onclick="manageSucursales()">🏪 Editar sucursales</div>
+</div>
+<input type="file" id="importFile" accept=".json" onchange="importBackup(event)">
+
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <h2 id="sheetTitle">Nueva factura</h2>
+
+  <div class="field">
+    <label>Fotos de la factura</label>
+    <div class="img-upload" id="imgUploadBox">
+      <span id="imgUploadText">Toca para subir o tomar fotos (puedes elegir varias)</span>
+      <input type="file" accept="image/*" id="imgInput" multiple onchange="handleImage(event)">
+    </div>
+    <div class="img-grid" id="imgGrid"></div>
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Proveedor</label>
+      <input type="text" id="fProveedor" placeholder="Ej. Merza, Sams Club...">
+    </div>
+    <div class="field">
+      <label>Sucursal</label>
+      <select id="fSucursal"></select>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>Número de factura (opcional)</label>
+    <input type="text" id="fNumero" placeholder="Ej. F-00123">
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Fecha en que llegó</label>
+      <input type="date" id="fLlegada">
+    </div>
+    <div class="field">
+      <label>Fecha de pago</label>
+      <input type="date" id="fVencimiento">
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="field">
+      <label>Monto (MXN)</label>
+      <input type="number" id="fMonto" placeholder="0.00" step="0.01">
+    </div>
+    <div class="field">
+      <label>Estado</label>
+      <select id="fEstado" onchange="toggleFechaPagada()">
+        <option value="pendiente">Pendiente</option>
+        <option value="pagada">Pagada</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field" id="fechaPagadaField" style="display:none;">
+    <label>Fecha en que se pagó</label>
+    <input type="date" id="fFechaPagada">
+  </div>
+
+  <div class="field">
+    <label>Se paga con</label>
+    <select id="fMetodo">
+      <option value="">Sin especificar</option>
+      <option value="Efectivo">Efectivo</option>
+      <option value="Rappi Card">Rappi Card</option>
+      <option value="Nu Bank">Nu Bank</option>
+      <option value="Transferencia">Transferencia</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Notas (opcional)</label>
+    <textarea id="fNotas" placeholder="Comentarios, condiciones, etc."></textarea>
+  </div>
+
+  <div class="sheet-actions">
+    <button class="btn btn-secondary" onclick="closeSheet()">Cancelar</button>
+    <button class="btn btn-primary" onclick="saveFactura()">Guardar</button>
+  </div>
+  <div class="sheet-actions" id="deleteRow" style="display:none;">
+    <button class="btn btn-danger" onclick="deleteFactura()">Eliminar factura</button>
+  </div>
+</div>
+
+<div class="viewer-overlay" id="viewerOverlay" onclick="closeViewer()">
+  <button class="viewer-close" onclick="closeViewer(event)">✕</button>
+  <button class="viewer-nav prev" id="viewerPrev" onclick="navViewer(event,-1)">‹</button>
+  <img id="viewerImg" onclick="event.stopPropagation()">
+  <button class="viewer-nav next" id="viewerNext" onclick="navViewer(event,1)">›</button>
+  <div class="viewer-counter" id="viewerCounter" style="display:none;"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'facturas_app_data';
+const SUCURSALES_KEY = 'facturas_app_sucursales';
+
+let facturas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+facturas.forEach(f => {
+  if(!Array.isArray(f.imagenes)){
+    f.imagenes = f.imagen ? [f.imagen] : [];
+  }
+});
+let sucursales = JSON.parse(localStorage.getItem(SUCURSALES_KEY) || 'null') || ['Abarrotes 3 Plebes', 'Abarrotes Paola'];
+let editingId = null;
+let currentImages = [];
+let currentFilter = 'todas';
+let currentSucursal = 'todas';
+let viewerImages = [];
+let viewerIndex = 0;
+
+function saveData(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(facturas));
+  render();
+}
+function saveSucursales(){
+  localStorage.setItem(SUCURSALES_KEY, JSON.stringify(sucursales));
+}
+function todayISO(){
+  return new Date().toISOString().split('T')[0];
+}
+function daysUntil(dateStr){
+  const today = new Date(todayISO());
+  const target = new Date(dateStr);
+  return Math.round((target - today) / 86400000);
+}
+function urgency(f){
+  if(f.estado === 'pagada') return 'paid';
+  const d = daysUntil(f.vencimiento);
+  if(d < 0) return 'danger';
+  if(d <= 3) return 'warn';
+  return 'ok';
+}
+function urgencyLabel(f){
+  if(f.estado === 'pagada') return 'Pagada';
+  const d = daysUntil(f.vencimiento);
+  if(d < 0) return 'Vencida hace ' + Math.abs(d) + 'd';
+  if(d === 0) return 'Vence hoy';
+  return 'Vence en ' + d + 'd';
+}
+function fmtDate(dateStr){
+  if(!dateStr) return '';
+  const [y,m,d] = dateStr.split('-');
+  return d + '/' + m + '/' + y;
+}
+function fmtMoney(n){
+  return '$' + Number(n||0).toLocaleString('es-MX', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function renderSucursalTabs(){
+  const wrap = document.getElementById('sucursalTabs');
+  let html = '<button class="suc-btn ' + (currentSucursal==='todas'?'active':'') + '" data-s="todas">Todas las sucursales</button>';
+  sucursales.forEach(s => {
+    html += '<button class="suc-btn ' + (currentSucursal===s?'active':'') + '" data-s="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>';
+  });
+  wrap.innerHTML = html;
+  wrap.querySelectorAll('.suc-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentSucursal = btn.dataset.s;
+      renderSucursalTabs();
+      render();
+    });
+  });
+}
+
+function fillSucursalSelect(){
+  const sel = document.getElementById('fSucursal');
+  sel.innerHTML = sucursales.map(s => '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>').join('');
+}
+
+function getScopedFacturas(){
+  return currentSucursal === 'todas' ? facturas : facturas.filter(f => f.sucursal === currentSucursal);
+}
+
+function renderSummary(){
+  const scope = getScopedFacturas();
+  const pendientes = scope.filter(f => f.estado === 'pendiente');
+  const vencidas = pendientes.filter(f => daysUntil(f.vencimiento) < 0);
+  const totalPendiente = pendientes.reduce((s,f) => s + Number(f.monto||0), 0);
+  document.getElementById('summary').innerHTML =
+    '<div class="chip warn"><div class="num">' + pendientes.length + '</div><div class="lbl">Pendientes</div></div>' +
+    '<div class="chip danger"><div class="num">' + vencidas.length + '</div><div class="lbl">Vencidas</div></div>' +
+    '<div class="chip ok"><div class="num">' + fmtMoney(totalPendiente) + '</div><div class="lbl">Por pagar</div></div>';
+}
+
+function getFiltered(){
+  let arr = getScopedFacturas();
+  if(currentFilter === 'pendientes') arr = arr.filter(f => f.estado === 'pendiente');
+  else if(currentFilter === 'vencidas') arr = arr.filter(f => f.estado === 'pendiente' && daysUntil(f.vencimiento) < 0);
+  else if(currentFilter === 'pagadas') arr = arr.filter(f => f.estado === 'pagada');
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if(q){
+    arr = arr.filter(f =>
+      (f.proveedor||'').toLowerCase().includes(q) ||
+      (f.notas||'').toLowerCase().includes(q) ||
+      (f.numero||'').toLowerCase().includes(q)
+    );
+  }
+  arr.sort((a,b) => {
+    if(a.estado !== b.estado) return a.estado === 'pendiente' ? -1 : 1;
+    return new Date(a.vencimiento) - new Date(b.vencimiento);
+  });
+  return arr;
+}
+
+function render(){
+  renderSummary();
+  const list = document.getElementById('list');
+  const arr = getFiltered();
+  if(arr.length === 0){
+    list.innerHTML = '<div class="empty">No hay facturas aquí.<br>Toca + para agregar una.</div>';
+    return;
+  }
+  list.innerHTML = arr.map(f => {
+    const u = urgency(f);
+    const imgs = f.imagenes || [];
+    const thumb = imgs.length
+      ? '<div class="thumb" style="background-image:url(\'' + imgs[0] + '\');position:relative;" onclick="event.stopPropagation();viewImage(\'' + f.id + '\')">' + (imgs.length>1 ? '<span class="img-count-badge">' + imgs.length + '</span>' : '') + '</div>'
+      : '<div class="thumb">🧾</div>';
+    const metodo = f.metodo ? ' · ' + escapeHtml(f.metodo) : '';
+    return '<div class="card" onclick="openSheet(\'' + f.id + '\')">' +
+      thumb +
+      '<div class="info">' +
+        '<div class="row1"><div class="prov">' + escapeHtml(f.proveedor || 'Sin proveedor') + '</div><div class="monto">' + fmtMoney(f.monto) + '</div></div>' +
+        '<div class="meta">Llegó: ' + fmtDate(f.llegada) + ' · Pago: ' + fmtDate(f.vencimiento) + metodo + '</div>' +
+        '<div class="badge-row"><span class="badge ' + u + '">' + urgencyLabel(f) + '</span>' +
+        (f.sucursal ? '<span class="badge paid suc-tag">' + escapeHtml(f.sucursal) + '</span>' : '') +
+        '</div></div></div>';
+  }).join('');
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.f;
+    render();
+  });
+});
+
+function toggleFechaPagada(){
+  const estado = document.getElementById('fEstado').value;
+  document.getElementById('fechaPagadaField').style.display = estado === 'pagada' ? 'block' : 'none';
+  if(estado === 'pagada' && !document.getElementById('fFechaPagada').value){
+    document.getElementById('fFechaPagada').value = todayISO();
+  }
+}
+
+function renderImgGrid(){
+  const grid = document.getElementById('imgGrid');
+  grid.innerHTML = currentImages.map((img, i) =>
+    '<div class="img-grid-item"><img src="' + img + '" onclick="openViewerFromForm(' + i + ')"><button class="rm" onclick="removeImageAt(event,' + i + ')">✕</button></div>'
+  ).join('');
+}
+
+function openSheet(id){
+  editingId = id || null;
+  currentImages = [];
+  fillSucursalSelect();
+  document.getElementById('imgUploadText').textContent = 'Toca para subir o tomar fotos (puedes elegir varias)';
+  if(id){
+    const f = facturas.find(x => x.id === id);
+    document.getElementById('sheetTitle').textContent = 'Editar factura';
+    document.getElementById('fProveedor').value = f.proveedor || '';
+    document.getElementById('fSucursal').value = f.sucursal || sucursales[0];
+    document.getElementById('fNumero').value = f.numero || '';
+    document.getElementById('fLlegada').value = f.llegada || '';
+    document.getElementById('fVencimiento').value = f.vencimiento || '';
+    document.getElementById('fMonto').value = f.monto || '';
+    document.getElementById('fEstado').value = f.estado || 'pendiente';
+    document.getElementById('fFechaPagada').value = f.fechaPagada || '';
+    document.getElementById('fMetodo').value = f.metodo || '';
+    document.getElementById('fNotas').value = f.notas || '';
+    toggleFechaPagada();
+    currentImages = [...(f.imagenes || [])];
+    document.getElementById('deleteRow').style.display = 'flex';
+  } else {
+    document.getElementById('sheetTitle').textContent = 'Nueva factura';
+    document.getElementById('fProveedor').value = '';
+    document.getElementById('fSucursal').value = currentSucursal !== 'todas' ? currentSucursal : sucursales[0];
+    document.getElementById('fNumero').value = '';
+    document.getElementById('fLlegada').value = todayISO();
+    document.getElementById('fVencimiento').value = '';
+    document.getElementById('fMonto').value = '';
+    document.getElementById('fEstado').value = 'pendiente';
+    document.getElementById('fFechaPagada').value = '';
+    document.getElementById('fMetodo').value = '';
+    document.getElementById('fNotas').value = '';
+    toggleFechaPagada();
+    document.getElementById('deleteRow').style.display = 'none';
+  }
+  renderImgGrid();
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('sheet').classList.add('show');
+}
+
+function closeSheet(){
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('sheet').classList.remove('show');
+}
+
+function handleImage(e){
+  const files = Array.from(e.target.files || []);
+  if(!files.length) return;
+  let pending = files.length;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      currentImages.push(ev.target.result);
+      pending--;
+      if(pending === 0){
+        renderImgGrid();
+        document.getElementById('imgUploadText').textContent = currentImages.length + ' foto(s) — toca para agregar más';
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function removeImageAt(e, i){
+  e.stopPropagation();
+  currentImages.splice(i, 1);
+  renderImgGrid();
+  document.getElementById('imgUploadText').textContent = currentImages.length
+    ? currentImages.length + ' foto(s) — toca para agregar más'
+    : 'Toca para subir o tomar fotos (puedes elegir varias)';
+}
+
+function openViewerFromForm(i){
+  viewerImages = currentImages;
+  viewerIndex = i;
+  showViewerImage();
+  document.getElementById('viewerOverlay').classList.add('show');
+}
+
+function saveFactura(){
+  const proveedor = document.getElementById('fProveedor').value.trim();
+  const sucursal = document.getElementById('fSucursal').value;
+  const numero = document.getElementById('fNumero').value.trim();
+  const llegada = document.getElementById('fLlegada').value;
+  const vencimiento = document.getElementById('fVencimiento').value;
+  const monto = document.getElementById('fMonto').value;
+  const estado = document.getElementById('fEstado').value;
+  const fechaPagada = document.getElementById('fFechaPagada').value;
+  const metodo = document.getElementById('fMetodo').value;
+  const notas = document.getElementById('fNotas').value.trim();
+  if(!proveedor){ alert('Ponle el nombre del proveedor'); return; }
+  if(!vencimiento){ alert('Falta la fecha de pago'); return; }
+  if(editingId){
+    const f = facturas.find(x => x.id === editingId);
+    Object.assign(f, {proveedor, sucursal, numero, llegada, vencimiento, monto, estado, fechaPagada, metodo, notas, imagenes: [...currentImages]});
+    delete f.imagen;
+  } else {
+    facturas.push({
+      id: 'f_' + Date.now(),
+      proveedor, sucursal, numero, llegada, vencimiento, monto, estado, fechaPagada, metodo, notas,
+      imagenes: [...currentImages]
+    });
+  }
+  saveData();
+  closeSheet();
+}
+
+function deleteFactura(){
+  if(!confirm('¿Eliminar esta factura?')) return;
+  facturas = facturas.filter(f => f.id !== editingId);
+  saveData();
+  closeSheet();
+}
+
+function viewImage(id){
+  const f = facturas.find(x => x.id === id);
+  if(!f || !f.imagenes || !f.imagenes.length) return;
+  viewerImages = f.imagenes;
+  viewerIndex = 0;
+  showViewerImage();
+  document.getElementById('viewerOverlay').classList.add('show');
+}
+
+function showViewerImage(){
+  document.getElementById('viewerImg').src = viewerImages[viewerIndex];
+  const multi = viewerImages.length > 1;
+  document.getElementById('viewerPrev').style.display = multi ? 'block' : 'none';
+  document.getElementById('viewerNext').style.display = multi ? 'block' : 'none';
+  const counter = document.getElementById('viewerCounter');
+  counter.style.display = multi ? 'block' : 'none';
+  counter.textContent = (viewerIndex + 1) + ' / ' + viewerImages.length;
+}
+
+function navViewer(e, dir){
+  e.stopPropagation();
+  viewerIndex = (viewerIndex + dir + viewerImages.length) % viewerImages.length;
+  showViewerImage();
+}
+
+function closeViewer(e){
+  if(e) e.stopPropagation();
+  document.getElementById('viewerOverlay').classList.remove('show');
+}
+
+function toggleMenu(){
+  document.getElementById('menu').classList.toggle('show');
+  document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+function shareWhatsApp(){
+  const scope = getScopedFacturas().filter(f => f.estado === 'pendiente');
+  if(scope.length === 0){ alert('No hay facturas pendientes en esta vista.'); return; }
+  scope.sort((a,b) => new Date(a.vencimiento) - new Date(b.vencimiento));
+  const titulo = currentSucursal === 'todas' ? 'Todas las sucursales' : currentSucursal;
+  let msg = '*Facturas pendientes — ' + titulo + '*\n\n';
+  let total = 0;
+  scope.forEach(f => {
+    const d = daysUntil(f.vencimiento);
+    const estadoTxt = d < 0 ? '⚠️ Vencida hace ' + Math.abs(d) + 'd' : (d === 0 ? '🔶 Vence hoy' : 'Vence en ' + d + 'd');
+    msg += '• ' + f.proveedor + ' — ' + fmtMoney(f.monto) + ' — Pago: ' + fmtDate(f.vencimiento) + ' (' + estadoTxt + ')\n';
+    total += Number(f.monto || 0);
+  });
+  msg += '\n*Total pendiente: ' + fmtMoney(total) + '*';
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+  toggleMenu();
+}
+
+function exportBackup(){
+  const data = { facturas, sucursales, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'respaldo_facturas_' + todayISO() + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toggleMenu();
+}
+
+function importBackup(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!Array.isArray(data.facturas)) throw new Error('formato inválido');
+      if(!confirm('Se encontraron ' + data.facturas.length + ' facturas en el respaldo. ¿Reemplazar los datos actuales?')) return;
+      facturas = data.facturas;
+      if(Array.isArray(data.sucursales) && data.sucursales.length){
+        sucursales = data.sucursales;
+        saveSucursales();
+      }
+      saveData();
+      renderSucursalTabs();
+      alert('Respaldo restaurado correctamente.');
+    }catch(err){
+      alert('No se pudo leer el archivo de respaldo.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+  toggleMenu();
+}
+
+function manageSucursales(){
+  const actual = sucursales.join(', ');
+  const input = prompt('Escribe las sucursales separadas por coma:', actual);
+  if(input === null) return;
+  const nuevas = input.split(',').map(s => s.trim()).filter(Boolean);
+  if(nuevas.length === 0){ alert('Debe haber al menos una sucursal.'); return; }
+  sucursales = nuevas;
+  saveSucursales();
+  if(currentSucursal !== 'todas' && !sucursales.includes(currentSucursal)) currentSucursal = 'todas';
+  renderSucursalTabs();
+  render();
+  toggleMenu();
+}
+
+renderSucursalTabs();
+render();
+</script>
+</body>
+</html>
