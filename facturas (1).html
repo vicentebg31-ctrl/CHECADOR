@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Control de Facturas</title>
+<style>
+  :root{--bg:#12161c;--card:#1b212a;--card-hover:#212834;--line:#2a323d;--text:#eef1f5;--muted:#8b95a3;--accent:#e0a02c;--ok:#3fae6a;--warn:#e0a02c;--danger:#d9534f;--danger-bg:rgba(217,83,79,0.12);--warn-bg:rgba(224,160,44,0.12);--ok-bg:rgba(63,174,106,0.12);}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;padding-bottom:100px;}
+  header{padding:20px 16px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:10;}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  header h1{margin:0;font-size:20px;letter-spacing:0.3px;}
+  header p{margin:4px 0 0;color:var(--muted);font-size:13px;}
+  .conn{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-right:5px;}
+  .conn.on{background:var(--ok);}
+  .icon-btn{background:var(--card);border:1px solid var(--line);color:var(--text);width:38px;height:38px;border-radius:10px;font-size:16px;cursor:pointer;flex-shrink:0;}
+  .search-bar{margin:12px 16px 0;}
+  .search-bar input{width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);padding:10px 12px;border-radius:10px;font-size:14px;}
+  .summary{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;}
+  .chip{flex:1;min-width:100px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:center;}
+  .chip .num{font-size:18px;font-weight:700;}.chip .lbl{font-size:11px;color:var(--muted);margin-top:2px;}
+  .chip.danger .num{color:var(--danger);}.chip.warn .num{color:var(--warn);}.chip.ok .num{color:var(--ok);}
+  .filters{display:flex;gap:8px;padding:14px 16px 0;overflow-x:auto;}
+  .filter-btn{background:var(--card);border:1px solid var(--line);color:var(--muted);padding:7px 14px;border-radius:999px;font-size:13px;white-space:nowrap;cursor:pointer;}
+  .filter-btn.active{background:var(--accent);color:#1a1400;border-color:var(--accent);font-weight:600;}
+  .sucursal-tabs{display:flex;gap:8px;padding:10px 16px 0;overflow-x:auto;}
+  .suc-btn{background:transparent;border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:999px;font-size:12.5px;white-space:nowrap;cursor:pointer;}
+  .suc-btn.active{border-color:#5b8fd6;color:#5b8fd6;background:rgba(91,143,214,0.1);font-weight:600;}
+  .actions-row{display:flex;gap:8px;padding:14px 16px 0;}
+  .action-chip{flex:1;background:var(--card);border:1px solid var(--line);color:var(--text);padding:10px;border-radius:12px;font-size:12.5px;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .action-chip.whatsapp{color:#25D366;border-color:rgba(37,211,102,0.35);}
+  .list{padding:14px 16px 0;display:flex;flex-direction:column;gap:10px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;gap:12px;cursor:pointer;}
+  .card:active{background:var(--card-hover);}
+  .thumb{width:60px;height:60px;border-radius:10px;background:#0e1116 center/cover no-repeat;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:22px;border:1px solid var(--line);}
+  .info{flex:1;min-width:0;}.info .row1{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+  .info .prov{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .info .monto{font-weight:700;font-size:15px;white-space:nowrap;}
+  .info .meta{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .badge-row{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;}
+  .badge{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;}
+  .badge.danger{background:var(--danger-bg);color:var(--danger);}.badge.warn{background:var(--warn-bg);color:var(--warn);}
+  .badge.ok{background:var(--ok-bg);color:var(--ok);}.badge.paid{background:rgba(139,149,163,0.15);color:var(--muted);}
+  .suc-tag{color:#5b8fd6;font-size:11.5px;font-weight:600;}
+  .empty{text-align:center;color:var(--muted);padding:60px 20px;font-size:14px;}
+  .fab{position:fixed;bottom:22px;right:20px;width:58px;height:58px;border-radius:50%;background:var(--accent);color:#1a1400;font-size:30px;border:none;box-shadow:0 6px 18px rgba(224,160,44,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;}
+  .sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:30;display:none;}
+  .sheet-overlay.show{display:block;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);border-radius:20px 20px 0 0;max-height:92vh;overflow-y:auto;z-index:31;transform:translateY(100%);transition:transform 0.25s ease;padding:16px 16px 30px;}
+  .sheet.show{transform:translateY(0);}
+  .sheet-handle{width:40px;height:4px;background:var(--line);border-radius:99px;margin:0 auto 14px;}
+  .sheet h2{margin:0 0 16px;font-size:18px;}
+  .field{margin-bottom:14px;}.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+  .field input,.field select,.field textarea{width:100%;background:var(--card);border:1px solid var(--line);color:var(--text);padding:11px 12px;border-radius:10px;font-size:15px;font-family:inherit;}
+  .field textarea{resize:vertical;min-height:60px;}
+  .row2{display:flex;gap:10px;}.row2 .field{flex:1;}
+  .img-upload{border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;color:var(--muted);font-size:13px;cursor:pointer;position:relative;overflow:hidden;}
+  .img-upload input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;}
+  .img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin-top:10px;}
+  .img-grid-item{position:relative;width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);}
+  .img-grid-item img{width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;}
+  .img-grid-item .rm{position:absolute;top:3px;right:3px;width:20px;height:20px;background:rgba(0,0,0,0.65);color:#fff;border:none;border-radius:50%;font-size:12px;cursor:pointer;}
+  .img-count-badge{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,0.7);color:#fff;font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;}
+  .viewer-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.1);color:#fff;border:none;width:44px;height:44px;border-radius:50%;font-size:20px;}
+  .viewer-nav.prev{left:14px;}.viewer-nav.next{right:14px;}
+  .viewer-counter{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:999px;}
+  .sheet-actions{display:flex;gap:10px;margin-top:6px;}
+  .btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;}
+  .btn-primary{background:var(--accent);color:#1a1400;}.btn-secondary{background:var(--card);color:var(--text);border:1px solid var(--line);}
+  .btn-danger{background:var(--danger-bg);color:var(--danger);}
+  .btn:disabled{opacity:0.6;}
+  .viewer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:40;display:none;align-items:center;justify-content:center;}
+  .viewer-overlay.show{display:flex;}.viewer-overlay img{max-width:92%;max-height:85%;border-radius:8px;}
+  .viewer-close{position:absolute;top:18px;right:18px;background:rgba(255,255,255,0.1);color:#fff;border:none;width:38px;height:38px;border-radius:50%;font-size:18px;}
+  .menu-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:50;display:none;}
+  .menu-overlay.show{display:block;}
+  .menu{position:fixed;right:16px;top:64px;background:var(--card);border:1px solid var(--line);border-radius:14px;z-index:51;overflow:hidden;min-width:200px;display:none;}
+  .menu.show{display:block;}
+  .menu-item{padding:13px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--line);}
+  .menu-item:last-child{border-bottom:none;}.menu-item.danger{color:var(--danger);}
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;z-index:60;display:none;}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Control de Facturas</h1>
+      <p><span class="conn" id="connDot"></span><span id="connText">Conectando...</span></p>
+    </div>
+    <button class="icon-btn" onclick="toggleMenu()">&#8942;</button>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Buscar proveedor, notas o número de factura..." oninput="render()">
+  </div>
+</header>
+
+<div class="summary" id="summary"></div>
+<div class="sucursal-tabs" id="sucursalTabs"></div>
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-f="todas">Todas</button>
+  <button class="filter-btn" data-f="pendientes">Pendientes</button>
+  <button class="filter-btn" data-f="vencidas">Vencidas</button>
+  <button class="filter-btn" data-f="pagadas">Pagadas</button>
+</div>
+<div class="actions-row">
+  <div class="action-chip whatsapp" onclick="compartirWhatsApp()">&#128172; Enviar resumen</div>
+</div>
+
+<div class="list" id="list"></div>
+
+<button class="fab" onclick="openNew()">+</button>
+
+<div class="sheet-overlay" id="overlay" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <h2 id="sheetTitle">Nueva factura</h2>
+  <div class="row2">
+    <div class="field"><label>Proveedor</label><input type="text" id="fProveedor" placeholder="Ej. Jhoana, Merza..."></div>
+    <div class="field"><label>Sucursal</label><select id="fSucursal"></select></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Número / folio</label><input type="text" id="fNumero" placeholder="F-0001"></div>
+    <div class="field"><label>Monto</label><input type="number" id="fMonto" step="0.01" placeholder="0.00"></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Fecha de llegada</label><input type="date" id="fLlegada"></div>
+    <div class="field"><label>Fecha de pago</label><input type="date" id="fVencimiento"></div>
+  </div>
+  <div class="row2">
+    <div class="field"><label>Estado</label><select id="fEstado" onchange="toggleFechaPagada()">
+      <option value="pendiente">Pendiente</option>
+      <option value="pagada">Pagada</option>
+    </select></div>
+    <div class="field" id="fechaPagadaWrap" style="display:none;"><label>Fecha en que se pagó</label><input type="date" id="fFechaPagada"></div>
+  </div>
+  <div class="field">
+    <label>Método de pago</label>
+    <select id="fMetodo">
+      <option value="">Sin especificar</option>
+      <option value="Efectivo">Efectivo</option>
+      <option value="Transferencia">Transferencia</option>
+      <option value="Tarjeta">Tarjeta</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Notas</label>
+    <textarea id="fNotas" placeholder="Opcional"></textarea>
+  </div>
+  <div class="field">
+    <label>Fotos de la factura</label>
+    <div class="img-upload">
+      📷 Toca para tomar foto o subir imagen
+      <input type="file" id="fImagenes" accept="image/*" multiple onchange="handleImages(event)">
+    </div>
+    <div class="img-grid" id="imgGrid"></div>
+  </div>
+  <div class="sheet-actions">
+    <button class="btn btn-secondary" onclick="closeSheet()">Cancelar</button>
+    <button class="btn btn-primary" onclick="saveFactura()">Guardar</button>
+  </div>
+  <div class="sheet-actions" id="deleteRow" style="display:none;">
+    <button class="btn btn-danger" onclick="deleteFactura()">Eliminar factura</button>
+  </div>
+</div>
+
+<div class="viewer-overlay" id="viewerOverlay" onclick="document.getElementById('viewerOverlay').classList.remove('show')">
+  <button class="viewer-close" onclick="event.stopPropagation();document.getElementById('viewerOverlay').classList.remove('show')">&#10005;</button>
+  <button class="viewer-nav prev" onclick="navViewer(event,-1)">&#8249;</button>
+  <img id="viewerImg" onclick="event.stopPropagation()">
+  <button class="viewer-nav next" onclick="navViewer(event,1)">&#8250;</button>
+  <div class="viewer-counter" id="viewerCounter" style="display:none;"></div>
+</div>
+
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<div class="menu" id="menu">
+  <div class="menu-item" onclick="addSucursal()">➕ Agregar sucursal</div>
+  <div class="menu-item danger" onclick="clearFilters()">🔄 Quitar filtros</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, collection, onSnapshot, doc, setDoc, addDoc, deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAkD--Sa4o-0yw34FQHZ4oP3xF7kPXLHFs",
+  authDomain: "checador-7893a.firebaseapp.com",
+  projectId: "checador-7893a",
+  storageBucket: "checador-7893a.firebasestorage.app",
+  messagingSenderId: "716748426587",
+  appId: "1:716748426587:web:b0408e7764e7a408021e7e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const facturasCol = collection(db, "facturas_negocio");
+const configDoc = doc(db, "facturas_config", "sucursales");
+
+var facturas = [], sucursales = ["Abarrotes 3 Plebes", "Abarrotes Paola"];
+var editingId = null, currentImages = [], currentFilter = "todas", currentSucursal = "todas";
+var viewerImages = [], viewerIndex = 0;
+
+function setConn(on, text){
+  document.getElementById("connDot").classList.toggle("on", on);
+  document.getElementById("connText").textContent = text;
+}
+
+onSnapshot(facturasCol, function(snap){
+  facturas = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  facturas.forEach(function(f){ if(!Array.isArray(f.imagenes)) f.imagenes = f.imagen ? [f.imagen] : []; });
+  setConn(true, "Sincronizado en la nube");
+  renderSucursalTabs();
+  render();
+}, function(err){
+  console.error(err);
+  setConn(false, "Sin conexión — revisa tu internet");
+});
+
+onSnapshot(configDoc, function(d){
+  if(d.exists() && Array.isArray(d.data().lista) && d.data().lista.length){
+    sucursales = d.data().lista;
+  } else {
+    setDoc(configDoc, {lista: sucursales});
+  }
+  renderSucursalTabs();
+  fillSucursalSelect();
+});
+
+function fillSucursalSelect(){
+  var sel = document.getElementById("fSucursal");
+  var prev = sel.value;
+  sel.innerHTML = sucursales.map(function(s){ return '<option value="'+escapeHtml(s)+'">'+escapeHtml(s)+'</option>'; }).join("");
+  if(prev) sel.value = prev;
+}
+
+window.saveSucursales = function(){ setDoc(configDoc, {lista: sucursales}); };
+window.addSucursal = function(){
+  var nombre = prompt("Nombre de la nueva sucursal:");
+  if(!nombre || !nombre.trim()) return;
+  sucursales.push(nombre.trim());
+  saveSucursales();
+  toggleMenu();
+};
+
+function todayISO(){ return new Date().toISOString().split("T")[0]; }
+function daysUntil(d){ return Math.round((new Date(d) - new Date(todayISO())) / 86400000); }
+function urgency(f){ if(f.estado === "pagada") return "paid"; var d = daysUntil(f.vencimiento); return d < 0 ? "danger" : d <= 3 ? "warn" : "ok"; }
+function urgencyLabel(f){
+  if(f.estado === "pagada") return "Pagada";
+  var d = daysUntil(f.vencimiento);
+  return d < 0 ? "Vencida hace " + Math.abs(d) + "d" : d === 0 ? "Vence hoy" : "Vence en " + d + "d";
+}
+function fmtDate(s){ if(!s) return ""; var p = s.split("-"); return p[2] + "/" + p[1] + "/" + p[0]; }
+function fmtMoney(n){ return "$" + Number(n||0).toLocaleString("es-MX", {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function escapeHtml(s){ var d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+function showToast(msg){
+  var t = document.getElementById("toast");
+  t.textContent = msg; t.style.display = "block";
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(function(){ t.style.display = "none"; }, 2200);
+}
+
+function renderSucursalTabs(){
+  var w = document.getElementById("sucursalTabs");
+  var h = '<button class="suc-btn ' + (currentSucursal === "todas" ? "active" : "") + '" data-s="todas">Todas las sucursales</button>';
+  sucursales.forEach(function(s){ h += '<button class="suc-btn ' + (currentSucursal === s ? "active" : "") + '" data-s="' + escapeHtml(s) + '">' + escapeHtml(s) + '</button>'; });
+  w.innerHTML = h;
+  Array.prototype.forEach.call(w.querySelectorAll(".suc-btn"), function(b){
+    b.onclick = function(){ currentSucursal = b.dataset.s; renderSucursalTabs(); render(); };
+  });
+}
+
+document.getElementById("filters").addEventListener("click", function(e){
+  var b = e.target.closest(".filter-btn");
+  if(!b) return;
+  Array.prototype.forEach.call(document.querySelectorAll(".filter-btn"), function(x){ x.classList.remove("active"); });
+  b.classList.add("active");
+  currentFilter = b.dataset.f;
+  render();
+});
+
+window.clearFilters = function(){
+  currentFilter = "todas"; currentSucursal = "todas";
+  document.getElementById("searchInput").value = "";
+  Array.prototype.forEach.call(document.querySelectorAll(".filter-btn"), function(x){ x.classList.toggle("active", x.dataset.f === "todas"); });
+  renderSucursalTabs();
+  toggleMenu();
+  render();
+};
+
+function render(){
+  var q = document.getElementById("searchInput").value.trim().toLowerCase();
+  var list = facturas.filter(function(f){
+    if(currentSucursal !== "todas" && f.sucursal !== currentSucursal) return false;
+    if(currentFilter === "pendientes" && f.estado !== "pendiente") return false;
+    if(currentFilter === "vencidas" && !(f.estado === "pendiente" && daysUntil(f.vencimiento) < 0)) return false;
+    if(currentFilter === "pagadas" && f.estado !== "pagada") return false;
+    if(q){
+      var blob = (f.proveedor + " " + (f.numero||"") + " " + (f.notas||"")).toLowerCase();
+      if(blob.indexOf(q) === -1) return false;
+    }
+    return true;
+  });
+
+  list.sort(function(a,b){
+    if((a.estado === "pagada") !== (b.estado === "pagada")) return a.estado === "pagada" ? 1 : -1;
+    return new Date(a.vencimiento) - new Date(b.vencimiento);
+  });
+
+  var pendientesTodas = facturas.filter(function(f){ return f.estado === "pendiente"; });
+  var vencidasTodas = pendientesTodas.filter(function(f){ return daysUntil(f.vencimiento) < 0; });
+  var totalPend = pendientesTodas.reduce(function(s,f){ return s + Number(f.monto||0); }, 0);
+
+  document.getElementById("summary").innerHTML =
+    '<div class="chip warn"><div class="num">' + pendientesTodas.length + '</div><div class="lbl">Pendientes</div></div>' +
+    '<div class="chip danger"><div class="num">' + vencidasTodas.length + '</div><div class="lbl">Vencidas</div></div>' +
+    '<div class="chip ok"><div class="num">' + fmtMoney(totalPend) + '</div><div class="lbl">Por pagar</div></div>';
+
+  var wrap = document.getElementById("list");
+  if(!list.length){
+    wrap.innerHTML = '<div class="empty">No hay facturas en esta vista.</div>';
+    return;
+  }
+  wrap.innerHTML = list.map(function(f){
+    var u = urgency(f), imgs = f.imagenes || [];
+    var thumb = imgs.length ? '<div class="thumb" style="background-image:url(' + imgs[0] + ')"></div>' : '<div class="thumb">🧾</div>';
+    return '<div class="card" data-id="' + f.id + '">' + thumb +
+      '<div class="info">' +
+        '<div class="row1"><div class="prov">' + escapeHtml(f.proveedor||"") + '</div><div class="monto">' + fmtMoney(f.monto) + '</div></div>' +
+        '<div class="meta">' + (f.numero ? "Folio " + escapeHtml(f.numero) + " · " : "") + "vence " + fmtDate(f.vencimiento) + '</div>' +
+        '<div class="badge-row"><span class="badge ' + u + '">' + urgencyLabel(f) + '</span>' +
+        (f.sucursal ? '<span class="suc-tag">' + escapeHtml(f.sucursal) + '</span>' : '') + '</div>' +
+      '</div></div>';
+  }).join("");
+
+  Array.prototype.forEach.call(wrap.querySelectorAll(".card"), function(c){
+    c.onclick = function(){ openEdit(c.dataset.id); };
+  });
+}
+
+window.toggleFechaPagada = function(){
+  document.getElementById("fechaPagadaWrap").style.display = document.getElementById("fEstado").value === "pagada" ? "block" : "none";
+};
+
+window.openNew = function(){
+  editingId = null;
+  currentImages = [];
+  document.getElementById("sheetTitle").textContent = "Nueva factura";
+  document.getElementById("fProveedor").value = "";
+  fillSucursalSelect();
+  document.getElementById("fNumero").value = "";
+  document.getElementById("fMonto").value = "";
+  document.getElementById("fLlegada").value = todayISO();
+  document.getElementById("fVencimiento").value = "";
+  document.getElementById("fEstado").value = "pendiente";
+  document.getElementById("fFechaPagada").value = "";
+  document.getElementById("fMetodo").value = "";
+  document.getElementById("fNotas").value = "";
+  toggleFechaPagada();
+  renderImgGrid();
+  document.getElementById("deleteRow").style.display = "none";
+  openSheet();
+};
+
+window.openEdit = function(id){
+  var f = facturas.find(function(x){ return x.id === id; });
+  if(!f) return;
+  editingId = id;
+  currentImages = (f.imagenes || []).slice();
+  document.getElementById("sheetTitle").textContent = "Editar factura";
+  document.getElementById("fProveedor").value = f.proveedor || "";
+  fillSucursalSelect();
+  document.getElementById("fSucursal").value = f.sucursal || sucursales[0];
+  document.getElementById("fNumero").value = f.numero || "";
+  document.getElementById("fMonto").value = f.monto || "";
+  document.getElementById("fLlegada").value = f.llegada || "";
+  document.getElementById("fVencimiento").value = f.vencimiento || "";
+  document.getElementById("fEstado").value = f.estado || "pendiente";
+  document.getElementById("fFechaPagada").value = f.fechaPagada || "";
+  document.getElementById("fMetodo").value = f.metodo || "";
+  document.getElementById("fNotas").value = f.notas || "";
+  toggleFechaPagada();
+  renderImgGrid();
+  document.getElementById("deleteRow").style.display = "flex";
+  openSheet();
+};
+
+function openSheet(){
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById("sheet").classList.add("show");
+}
+window.closeSheet = function(){
+  document.getElementById("overlay").classList.remove("show");
+  document.getElementById("sheet").classList.remove("show");
+};
+
+// --- Compresión de imágenes para no pasar el límite de 1MB de Firestore ---
+function compressImage(file, maxDim, quality){
+  return new Promise(function(resolve, reject){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var img = new Image();
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if(w > h && w > maxDim){ h = Math.round(h * (maxDim / w)); w = maxDim; }
+        else if(h > maxDim){ w = Math.round(w * (maxDim / h)); h = maxDim; }
+        var canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+window.handleImages = function(event){
+  var files = Array.prototype.slice.call(event.target.files);
+  if(!files.length) return;
+  if(currentImages.length + files.length > 4){
+    alert("Máximo 4 fotos por factura.");
+  }
+  files = files.slice(0, Math.max(0, 4 - currentImages.length));
+  Promise.all(files.map(function(f){ return compressImage(f, 900, 0.55); }))
+    .then(function(results){
+      currentImages = currentImages.concat(results);
+      renderImgGrid();
+    })
+    .catch(function(){ alert("No se pudo procesar una de las fotos."); });
+  event.target.value = "";
+};
+
+function renderImgGrid(){
+  var g = document.getElementById("imgGrid");
+  g.innerHTML = currentImages.map(function(src, i){
+    return '<div class="img-grid-item"><img src="' + src + '" data-i="' + i + '"><button class="rm" data-i="' + i + '">&#10005;</button></div>';
+  }).join("");
+  Array.prototype.forEach.call(g.querySelectorAll("img"), function(im){
+    im.onclick = function(){ openViewerFromForm(parseInt(im.dataset.i, 10)); };
+  });
+  Array.prototype.forEach.call(g.querySelectorAll(".rm"), function(btn){
+    btn.onclick = function(e){
+      e.stopPropagation();
+      currentImages.splice(parseInt(btn.dataset.i, 10), 1);
+      renderImgGrid();
+    };
+  });
+}
+
+window.openViewerFromForm = function(i){
+  viewerImages = currentImages; viewerIndex = i; showViewerImage();
+  document.getElementById("viewerOverlay").classList.add("show");
+};
+window.viewImage = function(id){
+  var f = facturas.find(function(x){ return x.id === id; });
+  if(!f || !f.imagenes || !f.imagenes.length) return;
+  viewerImages = f.imagenes; viewerIndex = 0; showViewerImage();
+  document.getElementById("viewerOverlay").classList.add("show");
+};
+function showViewerImage(){
+  document.getElementById("viewerImg").src = viewerImages[viewerIndex];
+  var c = document.getElementById("viewerCounter");
+  if(viewerImages.length > 1){ c.style.display = "block"; c.textContent = (viewerIndex+1) + " / " + viewerImages.length; }
+  else c.style.display = "none";
+}
+window.navViewer = function(e, dir){
+  e.stopPropagation();
+  viewerIndex = (viewerIndex + dir + viewerImages.length) % viewerImages.length;
+  showViewerImage();
+};
+
+window.saveFactura = async function(){
+  var proveedor = document.getElementById("fProveedor").value.trim();
+  var vencimiento = document.getElementById("fVencimiento").value;
+  if(!proveedor){ alert("Ponle el nombre del proveedor"); return; }
+  if(!vencimiento){ alert("Falta la fecha de pago"); return; }
+  var data = {
+    proveedor: proveedor,
+    sucursal: document.getElementById("fSucursal").value,
+    numero: document.getElementById("fNumero").value.trim(),
+    llegada: document.getElementById("fLlegada").value,
+    vencimiento: vencimiento,
+    monto: document.getElementById("fMonto").value,
+    estado: document.getElementById("fEstado").value,
+    fechaPagada: document.getElementById("fFechaPagada").value,
+    metodo: document.getElementById("fMetodo").value,
+    notas: document.getElementById("fNotas").value.trim(),
+    imagenes: currentImages.slice()
+  };
+  var btn = document.querySelector(".sheet .btn-primary"), orig = btn.textContent;
+  btn.textContent = "Guardando..."; btn.disabled = true;
+  try{
+    if(editingId) await setDoc(doc(db, "facturas_negocio", editingId), data);
+    else await addDoc(facturasCol, data);
+    closeSheet();
+    showToast("Factura guardada");
+  }catch(err){
+    console.error(err);
+    if(String(err.message||"").toLowerCase().indexOf("longer than") !== -1) alert("Fotos muy pesadas. Quita alguna e intenta de nuevo.");
+    else alert("No se pudo guardar. Revisa tu internet.");
+  }finally{ btn.textContent = orig; btn.disabled = false; }
+};
+
+window.deleteFactura = async function(){
+  if(!confirm("¿Eliminar esta factura?")) return;
+  try{ await deleteDoc(doc(db, "facturas_negocio", editingId)); closeSheet(); showToast("Factura eliminada"); }
+  catch(err){ console.error(err); alert("No se pudo eliminar."); }
+};
+
+window.compartirWhatsApp = function(){
+  var pendientes = facturas.filter(function(f){ return f.estado === "pendiente"; })
+    .sort(function(a,b){ return new Date(a.vencimiento) - new Date(b.vencimiento); });
+  if(!pendientes.length){ alert("No hay facturas pendientes."); return; }
+  var texto = "*Facturas por pagar*\n\n";
+  pendientes.forEach(function(f){
+    var d = daysUntil(f.vencimiento);
+    var marca = d < 0 ? "🔴" : d <= 3 ? "🟠" : "🟢";
+    texto += marca + " " + f.proveedor + " (" + (f.sucursal||"") + ") — " + fmtMoney(f.monto) + " — vence " + fmtDate(f.vencimiento) + "\n";
+  });
+  var total = pendientes.reduce(function(s,f){ return s + Number(f.monto||0); }, 0);
+  texto += "\n*Total pendiente: " + fmtMoney(total) + "*";
+  window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank");
+};
+
+window.toggleMenu = function(){
+  document.getElementById("menu").classList.toggle("show");
+  document.getElementById("menuOverlay").classList.toggle("show");
+};
+
+fillSucursalSelect();
+render();
+</script>
+</body>
+</html>
