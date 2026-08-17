@@ -149,14 +149,14 @@
     <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Usa esto para marcar de qué folio viene el dinero (útil al dividir un monto en varias partes)</div>
   </div>
   <input type="text" id="concepto" placeholder="Concepto (ej. venta, pago proveedor, retiro dueño)">
-  <select id="caja" style="display:none;">
+  <select id="caja">
     <option value="">Caja...</option>
     <option value="Caja 1">Caja 1</option>
     <option value="Caja 2">Caja 2</option>
     <option value="Caja 3">Caja 3</option>
     <option value="Caja 4">Caja 4</option>
   </select>
-  <input type="text" id="cajero" placeholder="Cajero" style="display:none;">
+  <input type="text" id="cajero" placeholder="Cajero">
   <input type="text" id="recibe" placeholder="Quién lo recibe">
   <div class="err-msg" id="errMsg"></div>
   <button class="btn-add" onclick="agregar()">+ Agregar movimiento</button>
