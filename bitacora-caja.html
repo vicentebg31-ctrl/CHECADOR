@@ -144,10 +144,10 @@
     </select>
   </div>
   <input type="text" id="monto" placeholder="Monto" inputmode="decimal" oninput="formatearMonto(this)">
-  <div class="row2" id="folioRow" style="display:none;">
-    <input type="text" id="folioTicket" placeholder="Folio del ticket (referencia, opcional)">
+  <div id="folioRow" style="display:none;">
+    <input type="text" id="folioTicket" placeholder="Folio de origen (ej. C1604)">
+    <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Usa esto para marcar de qué folio viene el dinero (útil al dividir un monto en varias partes)</div>
   </div>
-  <div class="err-msg" id="folioAviso" style="color:var(--verde);"></div>
   <input type="text" id="concepto" placeholder="Concepto (ej. venta, pago proveedor, retiro dueño)">
   <select id="caja" style="display:none;">
     <option value="">Caja...</option>
@@ -163,6 +163,7 @@
 </div>
 
 <div class="filtro-bar">
+  <input type="text" id="filtroFolio" placeholder="Buscar folio o concepto" onkeydown="if(event.key==='Enter')render()">
   <input type="date" id="filtroFecha" onchange="render()">
   <select id="filtroTurno" onchange="render()" style="display:none;">
     <option value="">Todos los turnos</option>
@@ -224,8 +225,17 @@ const firebaseConfig = {
   messagingSenderId: "716748426587",
   appId: "1:716748426587:web:b0408e7764e7a408021e7e"
 };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app, db;
+try {
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+} catch(e){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    document.getElementById('emptyMsg').textContent = 'Error al iniciar Firebase: ' + e.message;
+    document.getElementById('emptyMsg').style.display = 'block';
+    document.getElementById('emptyMsg').style.color = 'var(--rojo)';
+  });
+}
 const COL = "caja_movimientos";
 const COL_FOLIOS = "caja_folios";
 
@@ -236,6 +246,7 @@ let unsubscribe = null;
 
 function marcarEstado(txt, color){
   const el = document.getElementById('estadoConexion');
+  if(!el) return;
   el.textContent = txt;
   el.style.color = color || '';
 }
@@ -245,19 +256,54 @@ function suscribirse(){
   movsCache = null;
   render();
   marcarEstado('· conectando…', 'var(--dim)');
-  const q = query(collection(db, COL),
-    where('cajaTipo', '==', cajaTipo),
-    where('sucursal', '==', sucursalActual));
-  unsubscribe = onSnapshot(q, snap => {
-    movsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    marcarEstado('· sincronizado', 'var(--verde)');
-    render();
-  }, err => {
-    console.error(err);
-    marcarEstado('· sin conexión', 'var(--rojo)');
-    movsCache = movsCache || [];
-    render();
-  });
+
+  if(!db){
+    marcarEstado('· error init', 'var(--rojo)');
+    document.getElementById('emptyMsg').textContent = 'Firebase no se inicializó. Revisa la consola.';
+    document.getElementById('emptyMsg').style.color = 'var(--rojo)';
+    return;
+  }
+
+  const timeoutAviso = setTimeout(()=>{
+    if(movsCache === null){
+      marcarEstado('· sin respuesta', 'var(--rojo)');
+      const em = document.getElementById('emptyMsg');
+      em.textContent = 'Firebase no responde. Revisa: 1) que exista la base de datos Firestore en el proyecto, 2) las reglas de seguridad, 3) tu conexión.';
+      em.style.color = 'var(--rojo)';
+      em.style.display = 'block';
+    }
+  }, 8000);
+
+  try {
+    const q = query(collection(db, COL),
+      where('cajaTipo', '==', cajaTipo),
+      where('sucursal', '==', sucursalActual));
+    unsubscribe = onSnapshot(q, snap => {
+      clearTimeout(timeoutAviso);
+      movsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      marcarEstado('· sincronizado', 'var(--verde)');
+      const em = document.getElementById('emptyMsg');
+      em.style.color = '';
+      render();
+    }, err => {
+      clearTimeout(timeoutAviso);
+      console.error(err);
+      marcarEstado('· error: ' + err.code, 'var(--rojo)');
+      const em = document.getElementById('emptyMsg');
+      em.textContent = 'Error de Firebase: ' + err.code + ' — ' + err.message;
+      em.style.color = 'var(--rojo)';
+      em.style.display = 'block';
+      movsCache = movsCache || [];
+    });
+  } catch(e){
+    clearTimeout(timeoutAviso);
+    console.error(e);
+    marcarEstado('· error', 'var(--rojo)');
+    const em = document.getElementById('emptyMsg');
+    em.textContent = 'Error al consultar: ' + e.message;
+    em.style.color = 'var(--rojo)';
+    em.style.display = 'block';
+  }
 }
 
 function cambiarTipoCaja(tipo){
@@ -440,12 +486,14 @@ async function confirmarPass(){
 }
 
 function limpiarFiltro(){
+  document.getElementById('filtroFolio').value = '';
   document.getElementById('filtroFecha').value = '';
   document.getElementById('filtroTurno').value = '';
   render();
 }
 
 function aplicarFiltro(movs){
+  const texto = document.getElementById('filtroFolio').value.trim().toLowerCase();
   const fecha = document.getElementById('filtroFecha').value;
   const turno = cajaTipo === 'chica' ? document.getElementById('filtroTurno').value : '';
   let selDia = null, selMes = null;
@@ -455,6 +503,10 @@ function aplicarFiltro(movs){
     selDia = partes[2];
   }
   return movs.filter(m=>{
+    if(texto){
+      const campos = [m.folio, m.folioTicket, m.concepto, m.recibe].map(v=>(v||'').toString().toLowerCase());
+      if(!campos.some(c=>c.includes(texto))) return false;
+    }
     if(fecha){
       let d, mo;
       if(m.fechaISO){
