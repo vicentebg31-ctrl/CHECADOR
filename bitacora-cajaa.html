@@ -119,15 +119,15 @@
   <div class="grupo-selector">
     <div class="etiqueta">Tipo de caja</div>
     <div class="tabs">
-      <div class="tab-caja active" data-caja="chica" onclick="cambiarTipoCaja('chica')">Caja Chica</div>
-      <div class="tab-caja" data-caja="grande" onclick="cambiarTipoCaja('grande')">Caja Grande</div>
+      <div class="tab-caja active" data-caja="chica">Caja Chica</div>
+      <div class="tab-caja" data-caja="grande">Caja Grande</div>
     </div>
   </div>
   <div class="grupo-selector" style="margin-bottom:0;">
     <div class="etiqueta">Tienda</div>
     <div class="tabs">
-      <div class="tab-suc active" data-suc="3 Plebes" onclick="cambiarSucursal('3 Plebes')">3 Plebes</div>
-      <div class="tab-suc" data-suc="Paola" onclick="cambiarSucursal('Paola')">Paola</div>
+      <div class="tab-suc active" data-suc="3 Plebes">3 Plebes</div>
+      <div class="tab-suc" data-suc="Paola">Paola</div>
     </div>
   </div>
 </div>
@@ -143,7 +143,7 @@
       <option value="Noche">Noche</option>
     </select>
   </div>
-  <input type="text" id="monto" placeholder="Monto" inputmode="decimal" oninput="formatearMonto(this)">
+  <input type="text" id="monto" placeholder="Monto" inputmode="decimal">
   <div id="folioRow" style="display:none;">
     <input type="text" id="folioTicket" placeholder="Folio de origen (ej. C1604)">
     <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Usa esto para marcar de qué folio viene el dinero (útil al dividir un monto en varias partes)</div>
@@ -159,19 +159,19 @@
   <input type="text" id="cajero" placeholder="Cajero">
   <input type="text" id="recibe" placeholder="Quién lo recibe">
   <div class="err-msg" id="errMsg"></div>
-  <button class="btn-add" onclick="agregar()">+ Agregar movimiento</button>
+  <button class="btn-add" id="btnAgregar">+ Agregar movimiento</button>
 </div>
 
 <div class="filtro-bar">
-  <input type="text" id="filtroFolio" placeholder="Buscar folio o concepto" onkeydown="if(event.key==='Enter')render()">
-  <input type="date" id="filtroFecha" onchange="render()">
-  <select id="filtroTurno" onchange="render()" style="display:none;">
+  <input type="text" id="filtroFolio" placeholder="Buscar folio o concepto">
+  <input type="date" id="filtroFecha">
+  <select id="filtroTurno" style="display:none;">
     <option value="">Todos los turnos</option>
     <option value="Tarde">Tarde</option>
     <option value="Noche">Noche</option>
   </select>
-  <button onclick="render()" style="background:#2c7a56;border-color:#2c7a56;">Buscar</button>
-  <button onclick="limpiarFiltro()">Limpiar</button>
+  <button id="btnBuscar" style="background:#2c7a56;border-color:#2c7a56;">Buscar</button>
+  <button id="btnLimpiar">Limpiar</button>
 </div>
 
 <div class="totales">
@@ -189,11 +189,11 @@
 <div class="empty" id="emptyMsg" style="display:none;">Sin movimientos todavía</div>
 
 <div class="wa-bar">
-  <button onclick="enviarWhatsApp()">Enviar bitácora por WhatsApp</button>
+  <button id="btnWhatsApp">Enviar bitácora por WhatsApp</button>
 </div>
 
 <div class="print-bar">
-  <button onclick="try{window.print()}catch(e){}">🖨️ Imprimir</button>
+  <button id="btnImprimir">🖨️ Imprimir</button>
 </div>
 
 <div class="recibo" id="reciboImprimir"></div>
@@ -201,22 +201,16 @@
 <div class="modal-bg" id="modalPass">
   <div class="modal-box">
     <h3>Contraseña para eliminar</h3>
-    <input type="password" id="passInput" placeholder="Contraseña" inputmode="numeric" onkeydown="if(event.key==='Enter')confirmarPass()">
+    <input type="password" id="passInput" placeholder="Contraseña" inputmode="numeric">
     <div class="err" id="passErr">Contraseña incorrecta</div>
     <div class="btns">
-      <button class="btn-cancelar" onclick="cerrarPassModal()">Cancelar</button>
-      <button class="btn-ok" onclick="confirmarPass()">Eliminar</button>
+      <button class="btn-cancelar" id="btnCancelarPass">Cancelar</button>
+      <button class="btn-ok" id="btnConfirmarPass">Eliminar</button>
     </div>
   </div>
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, doc, addDoc, deleteDoc,
-  onSnapshot, query, where, runTransaction
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
 const firebaseConfig = {
   apiKey: "AIzaSyAkD--Sa4o-0yw34FQHZ4oP3xF7kPXLHFs",
   authDomain: "checador-7893a.firebaseapp.com",
@@ -226,15 +220,25 @@ const firebaseConfig = {
   appId: "1:716748426587:web:b0408e7764e7a408021e7e"
 };
 let app, db;
-try {
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-} catch(e){
-  document.addEventListener('DOMContentLoaded', ()=>{
-    document.getElementById('emptyMsg').textContent = 'Error al iniciar Firebase: ' + e.message;
-    document.getElementById('emptyMsg').style.display = 'block';
-    document.getElementById('emptyMsg').style.color = 'var(--rojo)';
-  });
+let collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction;
+let firebaseListo = false;
+
+async function initFirebase(){
+  try {
+    const appMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    ({ collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction } = fsMod);
+    app = appMod.initializeApp(firebaseConfig);
+    db = fsMod.getFirestore(app);
+    firebaseListo = true;
+    suscribirse();
+  } catch(e){
+    console.error('No se pudo cargar Firebase:', e);
+    const em = document.getElementById('emptyMsg');
+    em.textContent = 'No se pudo conectar a la base de datos. Revisa tu conexión a internet o la red WiFi (puede estar bloqueando el acceso). La app sigue funcionando pero sin guardar/mostrar datos hasta reconectar.';
+    em.style.color = 'var(--rojo)';
+    em.style.display = 'block';
+  }
 }
 const COL = "caja_movimientos";
 const COL_FOLIOS = "caja_folios";
@@ -252,17 +256,16 @@ function marcarEstado(txt, color){
 }
 
 function suscribirse(){
+  if(!firebaseListo){
+    const em = document.getElementById('emptyMsg');
+    em.textContent = 'Esperando conexión a la base de datos…';
+    em.style.display = 'block';
+    return;
+  }
   if(unsubscribe) unsubscribe();
   movsCache = null;
   render();
   marcarEstado('· conectando…', 'var(--dim)');
-
-  if(!db){
-    marcarEstado('· error init', 'var(--rojo)');
-    document.getElementById('emptyMsg').textContent = 'Firebase no se inicializó. Revisa la consola.';
-    document.getElementById('emptyMsg').style.color = 'var(--rojo)';
-    return;
-  }
 
   const timeoutAviso = setTimeout(()=>{
     if(movsCache === null){
@@ -572,8 +575,8 @@ function render(){
       <td>${escapeHtml(m.recibe||'—')}</td>
       <td class="monto ${m.tipo==='ingreso'?'in':'out'}">${money(m.monto)}</td>
       <td>
-        <button class="del" title="Imprimir" onclick='imprimirRecibo(${JSON.stringify(m).replace(/'/g,"&#39;")})'>🖨️</button>
-        <button class="del" onclick="borrar('${m.id}')">✕</button>
+        <button class="del" title="Imprimir" data-action="imprimir" data-id="${m.id}">🖨️</button>
+        <button class="del" data-action="borrar" data-id="${m.id}">✕</button>
       </td>
     </tr>`;
   });
@@ -592,19 +595,42 @@ function enviarWhatsApp(){
   window.location.href = "https://wa.me/?text="+encodeURIComponent(texto);
 }
 
-window.cambiarTipoCaja = cambiarTipoCaja;
-window.cambiarSucursal = cambiarSucursal;
-window.formatearMonto = formatearMonto;
-window.agregar = agregar;
-window.render = render;
-window.limpiarFiltro = limpiarFiltro;
-window.imprimirRecibo = imprimirRecibo;
-window.borrar = borrar;
-window.cerrarPassModal = cerrarPassModal;
-window.confirmarPass = confirmarPass;
-window.enviarWhatsApp = enviarWhatsApp;
+function configurarEventos(){
+  document.querySelectorAll('.tab-caja').forEach(t=>{
+    t.addEventListener('click', ()=> cambiarTipoCaja(t.dataset.caja));
+  });
+  document.querySelectorAll('.tab-suc').forEach(t=>{
+    t.addEventListener('click', ()=> cambiarSucursal(t.dataset.suc));
+  });
+  document.getElementById('monto').addEventListener('input', function(){ formatearMonto(this); });
+  document.getElementById('btnAgregar').addEventListener('click', agregar);
+  document.getElementById('filtroFolio').addEventListener('keydown', e=>{ if(e.key==='Enter') render(); });
+  document.getElementById('filtroFecha').addEventListener('change', render);
+  document.getElementById('filtroTurno').addEventListener('change', render);
+  document.getElementById('btnBuscar').addEventListener('click', render);
+  document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltro);
+  document.getElementById('btnWhatsApp').addEventListener('click', enviarWhatsApp);
+  document.getElementById('btnImprimir').addEventListener('click', ()=>{ try{ window.print(); }catch(e){} });
+  document.getElementById('passInput').addEventListener('keydown', e=>{ if(e.key==='Enter') confirmarPass(); });
+  document.getElementById('btnCancelarPass').addEventListener('click', cerrarPassModal);
+  document.getElementById('btnConfirmarPass').addEventListener('click', confirmarPass);
+  document.getElementById('tbody').addEventListener('click', e=>{
+    const btn = e.target.closest('button[data-action]');
+    if(!btn) return;
+    const id = btn.dataset.id;
+    if(btn.dataset.action === 'borrar'){
+      borrar(id);
+    } else if(btn.dataset.action === 'imprimir'){
+      const m = (movsCache||[]).find(x=>x.id===id);
+      if(m) imprimirRecibo(m);
+    }
+  });
+}
 
+configurarEventos();
 aplicarCambioTipoCaja(cajaTipo);
+initFirebase();
 
+</script>
 </body>
 </html>
