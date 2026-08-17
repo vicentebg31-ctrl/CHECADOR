@@ -6,13 +6,17 @@
 <title>Bitácora de Caja</title>
 <style>
   :root{
-    --bg:#101512;
-    --panel:#171e1a;
-    --line:#28332c;
-    --ink:#edf1ee;
-    --dim:#8a9a91;
-    --verde:#3ea373;
-    --rojo:#c9584c;
+    --bg:#0d1310;
+    --panel:#161f19;
+    --line:#2a3a30;
+    --ink:#f5f9f6;
+    --dim:#8fa89c;
+    --verde:#22c55e;
+    --verde-dim:#16a34a;
+    --rojo:#f4523f;
+    --rojo-dim:#dc2626;
+    --dorado:#ffb627;
+    --dorado-dim:#e89d1c;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:30px;}
@@ -25,34 +29,34 @@
   .grupo-selector{margin-bottom:12px;}
   .grupo-selector .etiqueta{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:700;}
   .tab-caja{flex:1;padding:13px 9px;border-radius:10px;border:2px solid var(--line);background:var(--panel);color:var(--dim);font-size:14px;font-weight:800;text-align:center;letter-spacing:.2px;}
-  .tab-caja.active{background:linear-gradient(135deg,#3ea373,#2c7a56);color:#fff;border-color:#3ea373;box-shadow:0 2px 10px rgba(62,163,115,.35);}
+  .tab-caja.active{background:linear-gradient(135deg,var(--verde),var(--verde-dim));color:#fff;border-color:var(--verde);box-shadow:0 2px 14px rgba(34,197,94,.5);}
   .tab-suc{flex:1;padding:11px 9px;border-radius:10px;border:2px solid var(--line);background:var(--panel);color:var(--dim);font-size:13px;font-weight:700;text-align:center;}
-  .tab-suc.active{background:linear-gradient(135deg,#d1a24a,#b3843a);color:#12160f;border-color:#d1a24a;box-shadow:0 2px 10px rgba(209,162,74,.3);}
+  .tab-suc.active{background:linear-gradient(135deg,var(--dorado),var(--dorado-dim));color:#1a1206;border-color:var(--dorado);box-shadow:0 2px 14px rgba(255,182,39,.45);}
 
   .form{padding:14px 16px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--line);}
   .row2{display:flex;gap:8px;}
   select, input{padding:11px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:15px;width:100%;}
   select{flex:1;}
   input[type=number]{flex:1;}
-  .btn-add{padding:12px;border-radius:8px;border:none;background:#2c7a56;color:#fff;font-weight:700;font-size:14px;}
+  .btn-add{padding:12px;border-radius:8px;border:none;background:linear-gradient(135deg,var(--verde),var(--verde-dim));color:#fff;font-weight:700;font-size:14px;box-shadow:0 2px 10px rgba(34,197,94,.35);}
 
   .totales{display:flex;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);}
   .totales span{flex:1;display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;background:var(--panel);border:2px solid var(--line);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.4px;font-weight:700;}
   .totales b{font-size:16px;letter-spacing:0;text-transform:none;}
-  .totales .in{border-color:rgba(62,163,115,.4);background:rgba(62,163,115,.1);}
+  .totales .in{border-color:rgba(34,197,94,.5);background:rgba(34,197,94,.14);}
   .totales .in b{color:var(--verde);}
-  .totales .out{border-color:rgba(201,88,76,.4);background:rgba(201,88,76,.1);}
+  .totales .out{border-color:rgba(244,82,63,.5);background:rgba(244,82,63,.14);}
   .totales .out b{color:var(--rojo);}
-  .totales .saldo{border-color:rgba(209,162,74,.4);background:rgba(209,162,74,.1);}
-  .totales .saldo b{color:#d1a24a;}
+  .totales .saldo{border-color:rgba(255,182,39,.5);background:rgba(255,182,39,.14);}
+  .totales .saldo b{color:var(--dorado);}
 
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th{text-align:left;padding:8px 16px;color:var(--dim);font-weight:600;font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--line);}
   td{padding:11px 16px;border-bottom:1px solid var(--line);}
   tr td:first-child{color:var(--dim);white-space:nowrap;}
-  tr.fila-retiro{background:rgba(201,88,76,.16);}
+  tr.fila-retiro{background:rgba(244,82,63,.18);}
   tr.fila-retiro td:first-child{color:#f0aca3;border-left:4px solid var(--rojo);}
-  tr.fila-ingreso{background:rgba(62,163,115,.14);}
+  tr.fila-ingreso{background:rgba(34,197,94,.16);}
   tr.fila-ingreso td:first-child{color:#7fd1a8;border-left:4px solid var(--verde);}
   tr.fecha-header td{background:#1c2822;color:var(--dim);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:8px 16px;}
   .monto{text-align:right;font-weight:800;font-size:14px;white-space:nowrap;}
@@ -139,8 +143,8 @@
       <option value="retiro">Retiro</option>
     </select>
     <select id="turno" style="display:none;">
+      <option value="Mañana">Mañana</option>
       <option value="Tarde">Tarde</option>
-      <option value="Noche">Noche</option>
     </select>
   </div>
   <input type="text" id="monto" placeholder="Monto" inputmode="decimal">
@@ -167,10 +171,10 @@
   <input type="date" id="filtroFecha">
   <select id="filtroTurno" style="display:none;">
     <option value="">Todos los turnos</option>
+    <option value="Mañana">Mañana</option>
     <option value="Tarde">Tarde</option>
-    <option value="Noche">Noche</option>
   </select>
-  <button id="btnBuscar" style="background:#2c7a56;border-color:#2c7a56;">Buscar</button>
+  <button id="btnBuscar" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#22c55e;">Buscar</button>
   <button id="btnLimpiar">Limpiar</button>
 </div>
 
@@ -200,7 +204,7 @@
 
 <div class="modal-bg" id="modalPass">
   <div class="modal-box">
-    <h3>Contraseña para eliminar</h3>
+    <h3 id="modalPassTitulo">Contraseña para eliminar</h3>
     <input type="password" id="passInput" placeholder="Contraseña" inputmode="numeric">
     <div class="err" id="passErr">Contraseña incorrecta</div>
     <div class="btns">
@@ -312,6 +316,8 @@ function suscribirse(){
 function cambiarTipoCaja(tipo){
   if(tipo === 'grande' && cajaTipo !== 'grande'){
     modoPassword = 'verGrande';
+    document.getElementById('modalPassTitulo').textContent = 'Contraseña para entrar a Caja Grande';
+    document.getElementById('btnConfirmarPass').textContent = 'Entrar';
     document.getElementById('passInput').value = '';
     document.getElementById('passErr').style.display = 'none';
     document.getElementById('modalPass').classList.add('show');
@@ -462,6 +468,8 @@ let modoPassword = 'borrar';
 function borrar(id){
   modoPassword = 'borrar';
   idPendienteBorrar = id;
+  document.getElementById('modalPassTitulo').textContent = 'Contraseña para eliminar';
+  document.getElementById('btnConfirmarPass').textContent = 'Eliminar';
   document.getElementById('passInput').value = '';
   document.getElementById('passErr').style.display = 'none';
   document.getElementById('modalPass').classList.add('show');
