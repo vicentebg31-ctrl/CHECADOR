@@ -142,25 +142,35 @@
       <option value="ingreso">Ingreso</option>
       <option value="retiro">Retiro</option>
     </select>
-    <select id="turno" style="display:none;">
-      <option value="Mañana">Mañana</option>
-      <option value="Tarde">Tarde</option>
-    </select>
   </div>
   <input type="text" id="monto" placeholder="Monto" inputmode="decimal">
   <div id="folioRow" style="display:none;">
-    <input type="text" id="folioTicket" placeholder="Folio de origen (ej. C1604)">
-    <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Usa esto para marcar de qué folio viene el dinero (útil al dividir un monto en varias partes)</div>
+    <select id="folioOrigenSelect">
+      <option value="">De qué folio se retira…</option>
+      <option value="__manual__">Otro / escribir código…</option>
+    </select>
+    <input type="text" id="folioTicket" placeholder="Folio de origen (ej. C1604)" style="display:none;margin-top:6px;">
+    <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Selecciona de qué ingreso sale este retiro, o escribe el código manualmente</div>
   </div>
   <input type="text" id="concepto" placeholder="Concepto (ej. venta, pago proveedor, retiro dueño)">
-  <select id="caja">
-    <option value="">Caja...</option>
-    <option value="Caja 1">Caja 1</option>
-    <option value="Caja 2">Caja 2</option>
-    <option value="Caja 3">Caja 3</option>
-    <option value="Caja 4">Caja 4</option>
-  </select>
-  <input type="text" id="cajero" placeholder="Cajero">
+  <div id="origenChicaRow" style="display:none;">
+    <div class="etiqueta" style="font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;font-weight:700;">Folio(s) de origen (Caja Chica)</div>
+    <select id="origenChica1">
+      <option value="">Folio de Caja Chica…</option>
+      <option value="__manual__">Otro / escribir código…</option>
+    </select>
+    <input type="text" id="origenChica1Manual" placeholder="Folio (ej. C1604)" style="display:none;margin-top:6px;">
+    <button type="button" id="btnAgregarSegundoFolio" style="margin-top:8px;width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);background:#1f2a24;color:var(--ink);font-size:12px;font-weight:600;">+ Agregar segundo folio</button>
+    <div id="origenChica2Wrap" style="display:none;margin-top:8px;">
+      <select id="origenChica2">
+        <option value="">Folio de Caja Chica…</option>
+        <option value="__manual__">Otro / escribir código…</option>
+      </select>
+      <input type="text" id="origenChica2Manual" placeholder="Folio (ej. C1604)" style="display:none;margin-top:6px;">
+    </div>
+  </div>
+  <input type="text" id="cajero" placeholder="Quién lo da">
+  <input type="text" id="retira" placeholder="Quién retira" style="display:none;">
   <input type="text" id="recibe" placeholder="Quién lo recibe">
   <div class="err-msg" id="errMsg"></div>
   <button class="btn-add" id="btnAgregar">+ Agregar movimiento</button>
@@ -169,11 +179,6 @@
 <div class="filtro-bar">
   <input type="text" id="filtroFolio" placeholder="Buscar folio o concepto">
   <input type="date" id="filtroFecha">
-  <select id="filtroTurno" style="display:none;">
-    <option value="">Todos los turnos</option>
-    <option value="Mañana">Mañana</option>
-    <option value="Tarde">Tarde</option>
-  </select>
   <button id="btnBuscar" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#22c55e;">Buscar</button>
   <button id="btnLimpiar">Limpiar</button>
 </div>
@@ -186,7 +191,7 @@
 
 <table>
   <thead>
-    <tr><th>Folio</th><th>Fecha</th><th id="thTurno">Turno</th><th>Concepto</th><th id="thCaja">Caja</th><th id="thCajero">Cajero</th><th>Recibe</th><th style="text-align:right;">Monto</th><th></th></tr>
+    <tr><th>Folio</th><th>Fecha</th><th>Concepto</th><th id="thCajero">Quién da</th><th>Retira</th><th>Recibe</th><th style="text-align:right;">Monto</th><th></th></tr>
   </thead>
   <tbody id="tbody"></tbody>
 </table>
@@ -224,14 +229,14 @@ const firebaseConfig = {
   appId: "1:716748426587:web:b0408e7764e7a408021e7e"
 };
 let app, db;
-let collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction;
+let collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction, getDocs;
 let firebaseListo = false;
 
 async function initFirebase(){
   try {
     const appMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const fsMod = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    ({ collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction } = fsMod);
+    ({ collection, doc, addDoc, deleteDoc, onSnapshot, query, where, runTransaction, getDocs } = fsMod);
     app = appMod.initializeApp(firebaseConfig);
     db = fsMod.getFirestore(app);
     firebaseListo = true;
@@ -331,15 +336,7 @@ function aplicarCambioTipoCaja(tipo){
   cajaTipo = tipo;
   document.querySelectorAll('.tab-caja').forEach(t=>t.classList.toggle('active', t.dataset.caja===tipo));
   document.getElementById('tituloApp').textContent = tipo === 'chica' ? 'Bitácora de Caja Chica' : 'Bitácora de Caja Grande';
-  const mostrarTurno = tipo === 'chica';
-  document.getElementById('turno').style.display = mostrarTurno ? '' : 'none';
-  document.getElementById('filtroTurno').style.display = mostrarTurno ? '' : 'none';
-  document.getElementById('thTurno').style.display = mostrarTurno ? '' : 'none';
-  document.getElementById('folioRow').style.display = tipo === 'grande' ? '' : 'none';
-  document.getElementById('cajero').style.display = tipo === 'grande' ? 'none' : '';
-  document.getElementById('thCajero').style.display = tipo === 'grande' ? 'none' : '';
-  document.getElementById('caja').style.display = tipo === 'grande' ? 'none' : '';
-  document.getElementById('thCaja').style.display = tipo === 'grande' ? 'none' : '';
+  actualizarVisibilidadFolio();
   suscribirse();
 }
 
@@ -382,6 +379,61 @@ function valorMonto(id){
   return parseFloat((document.getElementById(id).value || '').replace(/,/g,'')) || 0;
 }
 
+function actualizarVisibilidadFolio(){
+  const tipo = document.getElementById('tipo').value;
+  document.getElementById('folioRow').style.display = tipo === 'retiro' ? '' : 'none';
+  document.getElementById('retira').style.display = tipo === 'retiro' ? '' : 'none';
+  document.getElementById('recibe').placeholder = tipo === 'retiro' ? 'Quién recibe el dinero' : 'Quién lo recibe';
+  document.getElementById('cajero').style.display = (tipo === 'ingreso') ? '' : 'none';
+  const mostrarOrigenChica = (cajaTipo === 'grande' && tipo === 'ingreso');
+  document.getElementById('origenChicaRow').style.display = mostrarOrigenChica ? '' : 'none';
+  if(tipo === 'retiro') poblarFolioOrigenSelect();
+  if(mostrarOrigenChica) poblarOrigenChicaSelects();
+}
+
+async function poblarOrigenChicaSelects(){
+  const sel1 = document.getElementById('origenChica1');
+  const sel2 = document.getElementById('origenChica2');
+  if(!sel1 || !sel2 || !firebaseListo) return;
+  const v1prev = sel1.value, v2prev = sel2.value;
+  const baseOptions = '<option value="">Folio de Caja Chica…</option><option value="__manual__">Otro / escribir código…</option>';
+  try{
+    const q = query(collection(db, COL), where('cajaTipo','==','chica'), where('sucursal','==',sucursalActual));
+    const snap = await getDocs(q);
+    let movs = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+    movs.sort((a,b)=> (b.fechaISO+b.horaISO).localeCompare(a.fechaISO+a.horaISO));
+    let opciones = baseOptions;
+    movs.slice(0,40).forEach(m=>{
+      const etiqueta = `${m.folio} · ${m.tipo==='ingreso'?'Ingreso':'Retiro'} · ${m.concepto} · ${money(m.monto)}`;
+      opciones += `<option value="${escapeHtml(m.folio)}">${escapeHtml(etiqueta)}</option>`;
+    });
+    sel1.innerHTML = opciones;
+    sel2.innerHTML = opciones;
+  }catch(e){
+    console.error('No se pudieron cargar folios de Caja Chica:', e);
+    sel1.innerHTML = baseOptions;
+    sel2.innerHTML = baseOptions;
+  }
+  if([...sel1.options].some(o=>o.value===v1prev)) sel1.value = v1prev;
+  if([...sel2.options].some(o=>o.value===v2prev)) sel2.value = v2prev;
+}
+
+function poblarFolioOrigenSelect(){
+  const sel = document.getElementById('folioOrigenSelect');
+  if(!sel) return;
+  const valorPrevio = sel.value;
+  sel.innerHTML = '<option value="">De qué folio se retira…</option><option value="__manual__">Otro / escribir código…</option>';
+  const ingresos = (movsCache||[]).filter(m=>m.tipo==='ingreso')
+    .sort((a,b)=> (b.fechaISO+b.horaISO).localeCompare(a.fechaISO+a.horaISO));
+  ingresos.forEach(m=>{
+    const opt = document.createElement('option');
+    opt.value = m.folio;
+    opt.textContent = `${m.folio} · ${m.concepto} · ${money(m.monto)}`;
+    sel.appendChild(opt);
+  });
+  if([...sel.options].some(o=>o.value===valorPrevio)) sel.value = valorPrevio;
+}
+
 function cambiarSucursal(suc){
   sucursalActual = suc;
   document.querySelectorAll('.tab-suc').forEach(t=>t.classList.toggle('active', t.dataset.suc===suc));
@@ -392,9 +444,11 @@ async function agregar(){
   const tipo = document.getElementById('tipo').value;
   const monto = valorMonto('monto');
   const concepto = document.getElementById('concepto').value.trim();
-  const caja = document.getElementById('caja').value.trim();
   const cajero = document.getElementById('cajero').value.trim();
   const recibe = document.getElementById('recibe').value.trim();
+  const retira = document.getElementById('retira').value.trim();
+  const origenChica1 = document.getElementById('origenChica1Manual').value.trim();
+  const origenChica2 = document.getElementById('origenChica2Manual').value.trim();
   const errBox = document.getElementById('errMsg');
   if(!monto || monto<=0){ errBox.textContent='Ingresa un monto válido'; errBox.style.display='block'; return; }
   if(!concepto){ errBox.textContent='Ingresa un concepto'; errBox.style.display='block'; return; }
@@ -410,12 +464,12 @@ async function agregar(){
     const nuevo = {
       cajaTipo, sucursal: sucursalActual,
       tipo, monto, concepto,
-      turno: cajaTipo === 'chica' ? document.getElementById('turno').value : null,
       folio,
-      folioTicket: cajaTipo === 'grande' ? (document.getElementById('folioTicket').value.trim() || '—') : '—',
-      caja: caja || '—',
+      folioTicket: tipo === 'retiro' ? (document.getElementById('folioTicket').value.trim() || '—') : '—',
       cajero: cajero || '—',
       recibe: recibe || '—',
+      retira: tipo === 'retiro' ? (retira || '—') : '—',
+      origenChica: (cajaTipo === 'grande' && tipo === 'ingreso') ? [origenChica1, origenChica2].filter(Boolean) : [],
       fechaISO: fechaLocalISO(now),
       fecha: now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit'}),
       horaISO: now.toTimeString().slice(0,5),
@@ -425,6 +479,17 @@ async function agregar(){
     imprimirRecibo({ id: ref.id, ...nuevo });
     document.getElementById('monto').value='';
     document.getElementById('folioTicket').value='';
+    document.getElementById('folioTicket').style.display='none';
+    document.getElementById('folioOrigenSelect').value='';
+    document.getElementById('retira').value='';
+    document.getElementById('origenChica1').value='';
+    document.getElementById('origenChica1Manual').value='';
+    document.getElementById('origenChica1Manual').style.display='none';
+    document.getElementById('origenChica2').value='';
+    document.getElementById('origenChica2Manual').value='';
+    document.getElementById('origenChica2Manual').style.display='none';
+    document.getElementById('origenChica2Wrap').style.display='none';
+    document.getElementById('btnAgregarSegundoFolio').textContent='+ Agregar segundo folio';
     document.getElementById('concepto').value='';
   }catch(e){
     console.error(e);
@@ -441,13 +506,13 @@ function imprimirRecibo(m){
     <h2>${m.tipo==='ingreso'?'INGRESO':'RETIRO'}</h2>
     <div class="sucursal-linea">${sucursalActual} · ${cajaTipo==='chica'?'Caja Chica':'Caja Grande'}</div>
     ${m.folio && m.folio!=='—' ? `<div class="folio-grande">Folio: ${m.folio}</div>` : ''}
-    ${(cajaTipo==='grande' && m.folioTicket && m.folioTicket!=='—') ? `<div style="text-align:center;font-size:10px;">Ref. ticket: ${escapeHtml(m.folioTicket)}</div>` : ''}
+    ${(m.folioTicket && m.folioTicket!=='—') ? `<div style="text-align:center;font-size:10px;">Folio de origen: ${escapeHtml(m.folioTicket)}</div>` : ''}
+    ${(m.origenChica && m.origenChica.length) ? `<div style="text-align:center;font-size:10px;">De Caja Chica: ${m.origenChica.map(escapeHtml).join(', ')}</div>` : ''}
     <table>
       <tr><td>Fecha</td><td>${m.fecha} ${m.hora}</td></tr>
-      ${cajaTipo==='chica' ? `<tr><td>Turno</td><td>${escapeHtml(m.turno||'—')}</td></tr>` : ''}
       <tr><td>Concepto</td><td>${escapeHtml(m.concepto)}</td></tr>
-      ${cajaTipo==='chica' ? `<tr><td>Caja</td><td>${escapeHtml(m.caja||'—')}</td></tr>` : ''}
-      ${cajaTipo==='chica' ? `<tr><td>Cajero</td><td>${escapeHtml(m.cajero||'—')}</td></tr>` : ''}
+      ${(m.cajero && m.cajero!=='—') ? `<tr><td>Quién da</td><td>${escapeHtml(m.cajero)}</td></tr>` : ''}
+      ${m.tipo==='retiro' ? `<tr><td>Retira</td><td>${escapeHtml(m.retira||'—')}</td></tr>` : ''}
       <tr><td>Recibe</td><td>${escapeHtml(m.recibe||'—')}</td></tr>
     </table>
     <div class="monto-final">${money(m.monto)}</div>
@@ -499,14 +564,12 @@ async function confirmarPass(){
 function limpiarFiltro(){
   document.getElementById('filtroFolio').value = '';
   document.getElementById('filtroFecha').value = '';
-  document.getElementById('filtroTurno').value = '';
   render();
 }
 
 function aplicarFiltro(movs){
   const texto = document.getElementById('filtroFolio').value.trim().toLowerCase();
   const fecha = document.getElementById('filtroFecha').value;
-  const turno = cajaTipo === 'chica' ? document.getElementById('filtroTurno').value : '';
   let selDia = null, selMes = null;
   if(fecha){
     const partes = fecha.split('-');
@@ -515,7 +578,7 @@ function aplicarFiltro(movs){
   }
   return movs.filter(m=>{
     if(texto){
-      const campos = [m.folio, m.folioTicket, m.concepto, m.recibe].map(v=>(v||'').toString().toLowerCase());
+      const campos = [m.folio, m.folioTicket, m.concepto, m.recibe, ...(m.origenChica||[])].map(v=>(v||'').toString().toLowerCase());
       if(!campos.some(c=>c.includes(texto))) return false;
     }
     if(fecha){
@@ -531,7 +594,6 @@ function aplicarFiltro(movs){
       }
       if(d !== selDia || mo !== selMes) return false;
     }
-    if(turno && m.turno !== turno) return false;
     return true;
   });
 }
@@ -550,6 +612,7 @@ function render(){
     return;
   }
 
+  if(document.getElementById('tipo').value === 'retiro') poblarFolioOrigenSelect();
   const movs = aplicarFiltro(movsCache);
   const totIn = movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
   const totOut = movs.filter(m=>m.tipo==='retiro').reduce((s,m)=>s+m.monto,0);
@@ -569,17 +632,16 @@ function render(){
   let fechaAnterior = null;
   ordenados.forEach(m=>{
     if(m.fecha !== fechaAnterior){
-      html += `<tr class="fecha-header"><td colspan="9">${m.fecha}</td></tr>`;
+      html += `<tr class="fecha-header"><td colspan="8">${m.fecha}</td></tr>`;
       fechaAnterior = m.fecha;
     }
     html += `
     <tr class="${m.tipo==='retiro'?'fila-retiro':'fila-ingreso'}">
-      <td style="font-weight:600;">${m.folio && m.folio!=='—' ? escapeHtml(m.folio) : '—'}${(cajaTipo==='grande' && m.folioTicket && m.folioTicket!=='—') ? '<br><span style="color:var(--dim);font-weight:400;font-size:11px;">ref: '+escapeHtml(m.folioTicket)+'</span>' : ''}</td>
+      <td style="font-weight:600;">${m.folio && m.folio!=='—' ? escapeHtml(m.folio) : '—'}${(m.folioTicket && m.folioTicket!=='—') ? '<br><span style="color:var(--dim);font-weight:400;font-size:11px;">ref: '+escapeHtml(m.folioTicket)+'</span>' : ''}${(m.origenChica && m.origenChica.length) ? '<br><span style="color:var(--dim);font-weight:400;font-size:11px;">de Chica: '+m.origenChica.map(escapeHtml).join(', ')+'</span>' : ''}</td>
       <td>${m.fecha}<br>${m.hora}</td>
-      <td style="${cajaTipo==='chica'?'':'display:none;'}">${escapeHtml(m.turno||'—')}</td>
       <td>${escapeHtml(m.concepto)}</td>
-      <td style="${cajaTipo==='grande'?'display:none;':''}">${escapeHtml(m.caja||'—')}</td>
-      <td style="${cajaTipo==='grande'?'display:none;':''}">${escapeHtml(m.cajero||'—')}</td>
+      <td>${escapeHtml(m.cajero||'—')}</td>
+      <td>${escapeHtml(m.retira||'—')}</td>
       <td>${escapeHtml(m.recibe||'—')}</td>
       <td class="monto ${m.tipo==='ingreso'?'in':'out'}">${money(m.monto)}</td>
       <td>
@@ -598,7 +660,7 @@ function enviarWhatsApp(){
   const etiquetaCaja = cajaTipo === 'chica' ? 'Caja Chica' : 'Caja Grande';
   let texto = `*Bitácora de ${etiquetaCaja} · ${sucursalActual}*\n\nIngresos: ${money(totIn)}\nRetiros: ${money(totOut)}\nSaldo: ${money(totIn-totOut)}\n\n`;
   movs.forEach(m=>{
-    texto += `${m.tipo==='ingreso'?'Ingreso':'Retiro'}: ${money(m.monto)}${m.folio && m.folio!=='—' ? ' ['+m.folio+']' : ''}${(cajaTipo==='grande' && m.folioTicket && m.folioTicket!=='—') ? ' (ref: '+m.folioTicket+')' : ''} - ${m.concepto}${cajaTipo==='chica' ? ' | Turno: '+m.turno : ''}${cajaTipo==='chica' ? ' | Caja: '+m.caja : ''}${cajaTipo==='chica' ? ' | Cajero: '+m.cajero : ''} | Recibe: ${m.recibe} (${m.fecha} ${m.hora})\n`;
+    texto += `${m.tipo==='ingreso'?'Ingreso':'Retiro'}: ${money(m.monto)}${m.folio && m.folio!=='—' ? ' ['+m.folio+']' : ''}${(m.folioTicket && m.folioTicket!=='—') ? ' (de folio: '+m.folioTicket+')' : ''}${(m.origenChica && m.origenChica.length) ? ' (de Caja Chica: '+m.origenChica.join(', ')+')' : ''} - ${m.concepto}${(m.cajero && m.cajero!=='—') ? ' | Quién da: '+m.cajero : ''}${m.tipo==='retiro' ? ' | Retira: '+m.retira : ''} | Recibe: ${m.recibe} (${m.fecha} ${m.hora})\n`;
   });
   window.location.href = "https://wa.me/?text="+encodeURIComponent(texto);
 }
@@ -610,11 +672,51 @@ function configurarEventos(){
   document.querySelectorAll('.tab-suc').forEach(t=>{
     t.addEventListener('click', ()=> cambiarSucursal(t.dataset.suc));
   });
+  document.getElementById('tipo').addEventListener('change', actualizarVisibilidadFolio);
+  document.getElementById('folioOrigenSelect').addEventListener('change', function(){
+    const val = this.value;
+    const input = document.getElementById('folioTicket');
+    if(val === '__manual__'){
+      input.style.display = '';
+      input.value = '';
+      input.focus();
+    } else {
+      input.style.display = 'none';
+      input.value = val;
+    }
+  });
   document.getElementById('monto').addEventListener('input', function(){ formatearMonto(this); });
+  function toggleManual(selectId, inputId){
+    const val = document.getElementById(selectId).value;
+    const input = document.getElementById(inputId);
+    if(val === '__manual__'){
+      input.style.display = '';
+      input.value = '';
+      input.focus();
+    } else {
+      input.style.display = 'none';
+      input.value = val;
+    }
+  }
+  document.getElementById('origenChica1').addEventListener('change', ()=> toggleManual('origenChica1','origenChica1Manual'));
+  document.getElementById('origenChica2').addEventListener('change', ()=> toggleManual('origenChica2','origenChica2Manual'));
+  document.getElementById('btnAgregarSegundoFolio').addEventListener('click', function(){
+    const wrap = document.getElementById('origenChica2Wrap');
+    const mostrando = wrap.style.display !== 'none';
+    if(mostrando){
+      wrap.style.display = 'none';
+      this.textContent = '+ Agregar segundo folio';
+      document.getElementById('origenChica2').value = '';
+      document.getElementById('origenChica2Manual').value = '';
+      document.getElementById('origenChica2Manual').style.display = 'none';
+    } else {
+      wrap.style.display = '';
+      this.textContent = '– Quitar segundo folio';
+    }
+  });
   document.getElementById('btnAgregar').addEventListener('click', agregar);
   document.getElementById('filtroFolio').addEventListener('keydown', e=>{ if(e.key==='Enter') render(); });
   document.getElementById('filtroFecha').addEventListener('change', render);
-  document.getElementById('filtroTurno').addEventListener('change', render);
   document.getElementById('btnBuscar').addEventListener('click', render);
   document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltro);
   document.getElementById('btnWhatsApp').addEventListener('click', enviarWhatsApp);
