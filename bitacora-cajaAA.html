@@ -184,11 +184,16 @@
   <button class="btn-add" id="btnAgregar">+ Agregar movimiento</button>
 </div>
 
-<div class="filtro-bar">
+<div class="filtro-bar" style="flex-wrap:wrap;">
   <input type="text" id="filtroFolio" placeholder="Buscar folio o concepto">
   <input type="date" id="filtroFecha">
   <button id="btnBuscar" style="background:linear-gradient(135deg,#22c55e,#16a34a);border-color:#22c55e;">Buscar</button>
   <button id="btnLimpiar">Limpiar</button>
+</div>
+<div class="tabs" style="padding:0 16px 12px;border-bottom:1px solid var(--line);">
+  <div class="tab tab-mov active" data-mov="todos">Todos</div>
+  <div class="tab tab-mov" data-mov="ingreso">Ingresos</div>
+  <div class="tab tab-mov" data-mov="retiro">Salidas</div>
 </div>
 
 <div class="totales">
@@ -674,6 +679,8 @@ async function confirmarPass(){
   cerrarPassModal();
 }
 
+let filtroTipoActual = 'todos';
+
 function limpiarFiltro(){
   document.getElementById('filtroFolio').value = '';
   document.getElementById('filtroFecha').value = '';
@@ -690,6 +697,7 @@ function aplicarFiltro(movs){
     selDia = partes[2];
   }
   return movs.filter(m=>{
+    if(filtroTipoActual !== 'todos' && m.tipo !== filtroTipoActual) return false;
     if(texto){
       const campos = [m.folio, m.folioTicket, m.concepto, m.recibe, ...(m.origenChica||[])].map(v=>(v||'').toString().toLowerCase());
       if(!campos.some(c=>c.includes(texto))) return false;
@@ -848,6 +856,13 @@ function configurarEventos(){
     }
   });
   document.getElementById('btnAgregar').addEventListener('click', agregar);
+  document.querySelectorAll('.tab-mov').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      filtroTipoActual = t.dataset.mov;
+      document.querySelectorAll('.tab-mov').forEach(x=>x.classList.toggle('active', x===t));
+      render();
+    });
+  });
   document.getElementById('filtroFolio').addEventListener('keydown', e=>{ if(e.key==='Enter') render(); });
   document.getElementById('filtroFecha').addEventListener('change', render);
   document.getElementById('btnBuscar').addEventListener('click', render);
