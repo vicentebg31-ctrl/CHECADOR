@@ -144,6 +144,7 @@
     </select>
   </div>
   <input type="text" id="monto" placeholder="Monto" inputmode="decimal">
+  <input type="text" id="bolsaMonto" placeholder="Monto por bolsita (opcional, ej. 300)" inputmode="decimal" style="display:none;">
   <div id="folioRow" style="display:none;">
     <select id="folioOrigenSelect">
       <option value="">De qué folio se retira…</option>
@@ -151,6 +152,13 @@
     </select>
     <input type="text" id="folioTicket" placeholder="Folio de origen (ej. C1604)" style="display:none;margin-top:6px;">
     <div class="err-msg" id="folioAviso" style="color:var(--verde);display:block;font-size:12px;">Selecciona de qué ingreso sale este retiro, o escribe el código manualmente</div>
+    <div id="bolsaHint" style="display:none;margin-top:8px;padding:10px;border:1px solid var(--line);border-radius:8px;background:#1f2a24;">
+      <div id="bolsaHintTexto" style="font-size:12px;color:var(--dim);margin-bottom:8px;"></div>
+      <div style="display:flex;gap:8px;">
+        <button type="button" id="btnBolsaMenos" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700;">− bolsita</button>
+        <button type="button" id="btnBolsaMas" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-weight:700;">+ bolsita</button>
+      </div>
+    </div>
   </div>
   <input type="text" id="concepto" placeholder="Concepto (ej. venta, pago proveedor, retiro dueño)">
   <div id="origenChicaRow" style="display:none;">
@@ -403,6 +411,8 @@ function actualizarVisibilidadFolio(){
   document.getElementById('retira').style.display = tipo === 'retiro' ? '' : 'none';
   document.getElementById('recibe').placeholder = tipo === 'retiro' ? 'Quién recibe el dinero' : 'Quién lo recibe';
   document.getElementById('cajero').style.display = (tipo === 'ingreso') ? '' : 'none';
+  document.getElementById('bolsaMonto').style.display = (tipo === 'ingreso') ? '' : 'none';
+  if(tipo !== 'retiro') document.getElementById('bolsaHint').style.display = 'none';
   const mostrarOrigenChica = (cajaTipo === 'grande' && tipo === 'ingreso');
   document.getElementById('origenChicaRow').style.display = mostrarOrigenChica ? '' : 'none';
   if(tipo === 'retiro') poblarFolioOrigenSelect();
@@ -446,10 +456,33 @@ function poblarFolioOrigenSelect(){
   ingresos.forEach(m=>{
     const opt = document.createElement('option');
     opt.value = m.folio;
-    opt.textContent = `${m.folio} · ${m.concepto} · ${money(m.monto)}`;
+    opt.textContent = `${m.folio} · ${m.concepto} · ${money(m.monto)}${m.bolsaMonto ? ' · bolsitas de '+money(m.bolsaMonto) : ''}`;
     sel.appendChild(opt);
   });
   if([...sel.options].some(o=>o.value===valorPrevio)) sel.value = valorPrevio;
+}
+
+function setMontoValor(valor){
+  const input = document.getElementById('monto');
+  input.value = valor > 0 ? String(valor) : '';
+  formatearMonto(input);
+}
+
+function actualizarBolsaHint(){
+  const folioSel = document.getElementById('folioOrigenSelect').value;
+  const hint = document.getElementById('bolsaHint');
+  if(!folioSel || folioSel === '__manual__'){ hint.style.display = 'none'; return; }
+  const ingreso = (movsCache||[]).find(m=>m.tipo==='ingreso' && m.folio===folioSel);
+  const bolsa = ingreso && ingreso.bolsaMonto ? Number(ingreso.bolsaMonto) : 0;
+  if(!bolsa || bolsa<=0){ hint.style.display = 'none'; return; }
+  const { disponibles } = calcularEstadoFolios();
+  const info = disponibles.find(m=>m.folio===folioSel);
+  const saldo = info ? info.saldo : 0;
+  const bolsitasDisponibles = Math.floor((saldo + 0.01) / bolsa);
+  document.getElementById('bolsaHintTexto').textContent = `Bolsitas de ${money(bolsa)} · quedan ${bolsitasDisponibles} disponibles (saldo ${money(saldo)})`;
+  hint.style.display = '';
+  hint.dataset.bolsa = bolsa;
+  hint.dataset.max = saldo;
 }
 
 function calcularEstadoFolios(){
@@ -491,11 +524,14 @@ function renderFolios(){
   }
   cont.innerHTML = lista.map(m=>{
     if(estadoFoliosActual === 'disponibles'){
+      const bolsa = m.bolsaMonto ? Number(m.bolsaMonto) : 0;
+      const bolsitas = bolsa>0 ? Math.floor((m.saldo + 0.01) / bolsa) : 0;
       return `<div style="padding:10px 0;border-bottom:1px solid var(--line);">
         <div style="font-weight:700;">${escapeHtml(m.folio)} <span style="color:var(--dim);font-weight:400;font-size:12px;">· ${escapeHtml(m.concepto)}</span></div>
         <div style="font-size:12px;color:var(--dim);">${m.fecha} ${m.hora}</div>
         <div style="margin-top:4px;font-size:12px;color:var(--dim);">Ingreso: ${money(m.monto)}${m.retirado>0 ? ' · Retirado: '+money(m.retirado) : ''}</div>
         <div style="margin-top:2px;color:var(--verde);font-weight:800;">Disponible: ${money(m.saldo)}</div>
+        ${bolsa>0 ? `<div style="margin-top:2px;font-size:12px;color:var(--dorado);">Bolsitas de ${money(bolsa)}: quedan ${bolsitas}</div>` : ''}
       </div>`;
     }
     return `<div style="padding:10px 0;border-bottom:1px solid var(--line);">
@@ -521,6 +557,7 @@ async function agregar(){
   const retira = document.getElementById('retira').value.trim();
   const origenChica1 = document.getElementById('origenChica1Manual').value.trim();
   const origenChica2 = document.getElementById('origenChica2Manual').value.trim();
+  const bolsaMonto = tipo === 'ingreso' ? valorMonto('bolsaMonto') : 0;
   const errBox = document.getElementById('errMsg');
   if(!monto || monto<=0){ errBox.textContent='Ingresa un monto válido'; errBox.style.display='block'; return; }
   if(!concepto){ errBox.textContent='Ingresa un concepto'; errBox.style.display='block'; return; }
@@ -542,6 +579,7 @@ async function agregar(){
       recibe: recibe || '—',
       retira: tipo === 'retiro' ? (retira || '—') : '—',
       origenChica: (cajaTipo === 'grande' && tipo === 'ingreso') ? [origenChica1, origenChica2].filter(Boolean) : [],
+      bolsaMonto: (tipo === 'ingreso' && bolsaMonto > 0) ? bolsaMonto : null,
       fechaISO: fechaLocalISO(now),
       fecha: now.toLocaleDateString('es-MX',{day:'2-digit',month:'2-digit'}),
       horaISO: now.toTimeString().slice(0,5),
@@ -550,6 +588,8 @@ async function agregar(){
     const ref = await addDoc(collection(db, COL), nuevo);
     imprimirRecibo({ id: ref.id, ...nuevo });
     document.getElementById('monto').value='';
+    document.getElementById('bolsaMonto').value='';
+    document.getElementById('bolsaHint').style.display='none';
     document.getElementById('folioTicket').value='';
     document.getElementById('folioTicket').style.display='none';
     document.getElementById('folioOrigenSelect').value='';
@@ -759,8 +799,25 @@ function configurarEventos(){
       input.style.display = 'none';
       input.value = val;
     }
+    actualizarBolsaHint();
+  });
+  document.getElementById('btnBolsaMenos').addEventListener('click', ()=>{
+    const hint = document.getElementById('bolsaHint');
+    const bolsa = Number(hint.dataset.bolsa || 0);
+    if(!bolsa) return;
+    const actual = valorMonto('monto');
+    setMontoValor(Math.max(0, actual - bolsa));
+  });
+  document.getElementById('btnBolsaMas').addEventListener('click', ()=>{
+    const hint = document.getElementById('bolsaHint');
+    const bolsa = Number(hint.dataset.bolsa || 0);
+    const max = Number(hint.dataset.max || 0);
+    if(!bolsa) return;
+    const actual = valorMonto('monto');
+    setMontoValor(Math.min(max, actual + bolsa));
   });
   document.getElementById('monto').addEventListener('input', function(){ formatearMonto(this); });
+  document.getElementById('bolsaMonto').addEventListener('input', function(){ formatearMonto(this); });
   function toggleManual(selectId, inputId){
     const val = document.getElementById(selectId).value;
     const input = document.getElementById(inputId);
