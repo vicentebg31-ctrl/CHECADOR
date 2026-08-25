@@ -451,12 +451,13 @@ function poblarFolioOrigenSelect(){
   if(!sel) return;
   const valorPrevio = sel.value;
   sel.innerHTML = '<option value="">De qué folio se retira…</option><option value="__manual__">Otro / escribir código…</option>';
-  const ingresos = (movsCache||[]).filter(m=>m.tipo==='ingreso')
+  const { disponibles } = calcularEstadoFolios();
+  const ingresos = disponibles.slice()
     .sort((a,b)=> (b.fechaISO+b.horaISO).localeCompare(a.fechaISO+a.horaISO));
   ingresos.forEach(m=>{
     const opt = document.createElement('option');
     opt.value = m.folio;
-    opt.textContent = `${m.folio} · ${m.concepto} · ${money(m.monto)}${m.bolsaMonto ? ' · bolsitas de '+money(m.bolsaMonto) : ''}`;
+    opt.textContent = `${m.folio} · ${m.concepto} · ${money(m.saldo)} disponible${m.bolsaMonto ? ' · bolsitas de '+money(m.bolsaMonto) : ''}`;
     sel.appendChild(opt);
   });
   if([...sel.options].some(o=>o.value===valorPrevio)) sel.value = valorPrevio;
