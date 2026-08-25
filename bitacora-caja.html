@@ -189,6 +189,10 @@
   <span class="saldo">Saldo<b id="totSaldo">$0.00</b></span>
 </div>
 
+<div class="wa-bar" style="padding-top:0;">
+  <button id="btnFolios" style="background:linear-gradient(135deg,var(--dorado),var(--dorado-dim));color:#1a1206;border:none;font-weight:800;">📋 Ver folios (están / salieron)</button>
+</div>
+
 <table>
   <thead>
     <tr><th>Folio</th><th>Fecha</th><th>Concepto</th><th id="thCajero">Quién da</th><th>Retira</th><th>Recibe</th><th style="text-align:right;">Monto</th><th></th></tr>
@@ -215,6 +219,20 @@
     <div class="btns">
       <button class="btn-cancelar" id="btnCancelarPass">Cancelar</button>
       <button class="btn-ok" id="btnConfirmarPass">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalFolios">
+  <div class="modal-box" style="max-width:380px;max-height:80vh;overflow:auto;">
+    <h3>Folios</h3>
+    <div class="tabs" style="margin-bottom:12px;">
+      <div class="tab tab-folios active" data-estado="disponibles">Están</div>
+      <div class="tab tab-folios" data-estado="salidos">Salieron</div>
+    </div>
+    <div id="listaFolios"></div>
+    <div class="btns" style="margin-top:14px;">
+      <button class="btn-cancelar" id="btnCerrarFolios" style="width:100%;">Cerrar</button>
     </div>
   </div>
 </div>
@@ -434,6 +452,60 @@ function poblarFolioOrigenSelect(){
   if([...sel.options].some(o=>o.value===valorPrevio)) sel.value = valorPrevio;
 }
 
+function calcularEstadoFolios(){
+  const movs = movsCache || [];
+  const ingresos = movs.filter(m=>m.tipo==='ingreso');
+  const retiradoPorFolio = {};
+  movs.filter(m=>m.tipo==='retiro' && m.folioTicket && m.folioTicket!=='—').forEach(m=>{
+    retiradoPorFolio[m.folioTicket] = (retiradoPorFolio[m.folioTicket] || 0) + m.monto;
+  });
+  const disponibles = [];
+  const salidos = [];
+  ingresos.forEach(m=>{
+    const retirado = retiradoPorFolio[m.folio] || 0;
+    const saldo = m.monto - retirado;
+    if(saldo > 0.01){
+      disponibles.push({ ...m, saldo, retirado });
+    } else {
+      salidos.push({ ...m, saldo: 0, retirado });
+    }
+  });
+  const porFecha = (a,b)=> (b.fechaISO+b.horaISO).localeCompare(a.fechaISO+a.horaISO);
+  disponibles.sort(porFecha);
+  salidos.sort(porFecha);
+  return { disponibles, salidos };
+}
+
+let estadoFoliosActual = 'disponibles';
+function renderFolios(){
+  const cont = document.getElementById('listaFolios');
+  if(movsCache === null){
+    cont.innerHTML = '<div class="empty" style="padding:16px 0;">Cargando…</div>';
+    return;
+  }
+  const { disponibles, salidos } = calcularEstadoFolios();
+  const lista = estadoFoliosActual === 'disponibles' ? disponibles : salidos;
+  if(lista.length === 0){
+    cont.innerHTML = `<div class="empty" style="padding:16px 0;">${estadoFoliosActual==='disponibles' ? 'No hay folios con saldo disponible' : 'No hay folios salidos todavía'}</div>`;
+    return;
+  }
+  cont.innerHTML = lista.map(m=>{
+    if(estadoFoliosActual === 'disponibles'){
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--line);">
+        <div style="font-weight:700;">${escapeHtml(m.folio)} <span style="color:var(--dim);font-weight:400;font-size:12px;">· ${escapeHtml(m.concepto)}</span></div>
+        <div style="font-size:12px;color:var(--dim);">${m.fecha} ${m.hora}</div>
+        <div style="margin-top:4px;font-size:12px;color:var(--dim);">Ingreso: ${money(m.monto)}${m.retirado>0 ? ' · Retirado: '+money(m.retirado) : ''}</div>
+        <div style="margin-top:2px;color:var(--verde);font-weight:800;">Disponible: ${money(m.saldo)}</div>
+      </div>`;
+    }
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--line);">
+      <div style="font-weight:700;">${escapeHtml(m.folio)} <span style="color:var(--dim);font-weight:400;font-size:12px;">· ${escapeHtml(m.concepto)}</span></div>
+      <div style="font-size:12px;color:var(--dim);">${m.fecha} ${m.hora} · Monto: ${money(m.monto)}</div>
+      <div style="margin-top:2px;color:var(--rojo);font-weight:800;">Salió completo</div>
+    </div>`;
+  }).join('');
+}
+
 function cambiarSucursal(suc){
   sucursalActual = suc;
   document.querySelectorAll('.tab-suc').forEach(t=>t.classList.toggle('active', t.dataset.suc===suc));
@@ -609,6 +681,7 @@ function render(){
     tbody.innerHTML = '';
     emptyMsg.textContent = 'Cargando…';
     emptyMsg.style.display = 'block';
+    if(document.getElementById('modalFolios').classList.contains('show')) renderFolios();
     return;
   }
 
@@ -624,6 +697,7 @@ function render(){
     tbody.innerHTML = '';
     emptyMsg.textContent = 'Sin movimientos todavía';
     emptyMsg.style.display = 'block';
+    if(document.getElementById('modalFolios').classList.contains('show')) renderFolios();
     return;
   }
   emptyMsg.style.display = 'none';
@@ -651,6 +725,7 @@ function render(){
     </tr>`;
   });
   tbody.innerHTML = html;
+  if(document.getElementById('modalFolios').classList.contains('show')) renderFolios();
 }
 
 function enviarWhatsApp(){
@@ -720,6 +795,22 @@ function configurarEventos(){
   document.getElementById('btnBuscar').addEventListener('click', render);
   document.getElementById('btnLimpiar').addEventListener('click', limpiarFiltro);
   document.getElementById('btnWhatsApp').addEventListener('click', enviarWhatsApp);
+  document.getElementById('btnFolios').addEventListener('click', ()=>{
+    estadoFoliosActual = 'disponibles';
+    document.querySelectorAll('.tab-folios').forEach(t=>t.classList.toggle('active', t.dataset.estado==='disponibles'));
+    renderFolios();
+    document.getElementById('modalFolios').classList.add('show');
+  });
+  document.getElementById('btnCerrarFolios').addEventListener('click', ()=>{
+    document.getElementById('modalFolios').classList.remove('show');
+  });
+  document.querySelectorAll('.tab-folios').forEach(t=>{
+    t.addEventListener('click', ()=>{
+      estadoFoliosActual = t.dataset.estado;
+      document.querySelectorAll('.tab-folios').forEach(x=>x.classList.toggle('active', x===t));
+      renderFolios();
+    });
+  });
   document.getElementById('btnImprimir').addEventListener('click', ()=>{ try{ window.print(); }catch(e){} });
   document.getElementById('passInput').addEventListener('keydown', e=>{ if(e.key==='Enter') confirmarPass(); });
   document.getElementById('btnCancelarPass').addEventListener('click', cerrarPassModal);
