@@ -46,6 +46,14 @@
   --cc-dim: #546e7a;
   --cc-texto: #0a1929;
   --cc-header: #01579b;
+
+  --gs-bg: #faf6ee;
+  --gs-border: #ddc9a3;
+  --gs-accent: #8d6e2f;
+  --gs-suave: #f3e9d2;
+  --gs-dim: #9c8358;
+  --gs-texto: #2e2410;
+  --gs-header: #6d4c1a;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -64,6 +72,7 @@ body {
   top: 0;
   z-index: 300;
   box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  overflow-x: auto;
 }
 .app-btn {
   flex: 1;
@@ -79,6 +88,7 @@ body {
   transition: all .25s;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 .app-btn::after {
   content: '';
@@ -100,6 +110,9 @@ body {
 .app-btn.cc { background: var(--cc-header); color: rgba(255,255,255,.5); }
 .app-btn.cc.active { color: #fff; }
 .app-btn.cc.active::after { background: #90caf9; transform: scaleX(1); }
+.app-btn.gs { background: var(--gs-header); color: rgba(255,255,255,.5); }
+.app-btn.gs.active { color: #fff; }
+.app-btn.gs.active::after { background: #e6d3a3; transform: scaleX(1); }
 
 /* APPS */
 .app { display: none; }
@@ -135,6 +148,7 @@ body {
 .sk .app-header { background: var(--sk-header); }
 .pn .app-header { background: var(--pn-header); }
 .cc .app-header { background: var(--cc-header); }
+.gs .app-header { background: var(--gs-header); }
 
 /* TABS */
 .tabs {
@@ -146,6 +160,7 @@ body {
 .sk .tabs { background: var(--sk-header); }
 .pn .tabs { background: var(--pn-header); }
 .cc .tabs { background: var(--cc-header); }
+.gs .tabs { background: var(--gs-header); }
 
 .tab {
   padding: 8px 16px;
@@ -173,6 +188,7 @@ body {
 .sk .panel { background: var(--sk-bg); padding: 14px 14px 0; }
 .pn .panel { background: var(--pn-bg); padding: 14px 14px 0; }
 .cc .panel { background: var(--cc-bg); padding: 14px 14px 0; }
+.gs .panel { background: var(--gs-bg); padding: 14px 14px 0; }
 
 /* STATS */
 .stats {
@@ -193,6 +209,7 @@ body {
 .sk .stat { border: 1.5px solid var(--sk-border); }
 .pn .stat { border: 1.5px solid var(--pn-border); }
 .cc .stat { border: 1.5px solid var(--cc-border); }
+.gs .stat { border: 1.5px solid var(--gs-border); }
 .stat .n {
   font-family: 'Syne', sans-serif;
   font-size: 1.45rem;
@@ -208,6 +225,8 @@ body {
 .pn .stat .l { color: var(--pn-dim); }
 .cc .stat .n { color: var(--cc-accent); }
 .cc .stat .l { color: var(--cc-dim); }
+.gs .stat .n { color: var(--gs-accent); }
+.gs .stat .l { color: var(--gs-dim); }
 .stat.warn .n { color: var(--naranja) !important; }
 .stat.bad  .n { color: var(--rojo-status) !important; }
 .stat.ok   .n { color: #2e7d32 !important; }
@@ -238,6 +257,8 @@ body {
 .pn .section-label::after { background: var(--pn-accent); }
 .cc .section-label { color: var(--cc-accent); }
 .cc .section-label::after { background: var(--cc-accent); }
+.gs .section-label { color: var(--gs-accent); }
+.gs .section-label::after { background: var(--gs-accent); }
 .section-label:first-child { margin-top: 0; }
 
 /* PRODUCT CARDS */
@@ -252,6 +273,7 @@ body {
 .sk .pcard { border: 1.5px solid var(--sk-border); }
 .pn .pcard { border: 1.5px solid var(--pn-border); }
 .cc .pcard { border: 1.5px solid var(--cc-border); }
+.gs .pcard { border: 1.5px solid var(--gs-border); }
 .pcard.needs {
   border-color: #ffb74d !important;
   background: var(--naranja-suave);
@@ -302,6 +324,7 @@ body {
 .sk .pcard-body { border-top: 1px solid var(--sk-border); }
 .pn .pcard-body { border-top: 1px solid var(--pn-border); }
 .cc .pcard-body { border-top: 1px solid var(--cc-border); }
+.gs .pcard-body { border-top: 1px solid var(--gs-border); }
 .pcard.open .pcard-body { display: block; }
 
 .pcard-fields {
@@ -321,6 +344,7 @@ body {
 .sk .pfield-label { color: var(--sk-dim); }
 .pn .pfield-label { color: var(--pn-dim); }
 .cc .pfield-label { color: var(--cc-dim); }
+.gs .pfield-label { color: var(--gs-dim); }
 .pfield-input {
   padding: 8px 10px;
   border-radius: 8px;
@@ -338,6 +362,8 @@ body {
 .pn .pfield-input:focus { border-color: var(--pn-accent); }
 .cc .pfield-input { border: 1.5px solid var(--cc-border); color: var(--cc-texto); background: var(--cc-bg); }
 .cc .pfield-input:focus { border-color: var(--cc-accent); }
+.gs .pfield-input { border: 1.5px solid var(--gs-border); color: var(--gs-texto); background: var(--gs-bg); }
+.gs .pfield-input:focus { border-color: var(--gs-accent); }
 
 .status-label-small {
   font-family: 'Syne', sans-serif;
@@ -351,6 +377,7 @@ body {
 .sk .status-label-small { color: var(--sk-dim); }
 .pn .status-label-small { color: var(--pn-dim); }
 .cc .status-label-small { color: var(--cc-dim); }
+.gs .status-label-small { color: var(--gs-dim); }
 
 .status-btns { display: flex; gap: 6px; }
 .sbtn {
@@ -371,6 +398,7 @@ body {
 .sk .sbtn { border-color: var(--sk-border); color: var(--sk-dim); }
 .pn .sbtn { border-color: var(--pn-border); color: var(--pn-dim); }
 .cc .sbtn { border-color: var(--cc-border); color: var(--cc-dim); }
+.gs .sbtn { border-color: var(--gs-border); color: var(--gs-dim); }
 .sbtn.active-ok     { background: #c8e6c9 !important; border-color: #81c784 !important; color: #2e7d32 !important; }
 .sbtn.active-needs  { background: #ffe0b2 !important; border-color: #ffb74d !important; color: var(--naranja) !important; }
 .sbtn.active-agotado { background: #ffcdd2 !important; border-color: #ef9a9a !important; color: var(--rojo-status) !important; }
@@ -414,6 +442,8 @@ body {
 .pn .add-input:focus { border-color: var(--pn-accent); }
 .cc .add-input { border: 1.5px dashed var(--cc-border); color: var(--cc-texto); }
 .cc .add-input:focus { border-color: var(--cc-accent); }
+.gs .add-input { border: 1.5px dashed var(--gs-border); color: var(--gs-texto); }
+.gs .add-input:focus { border-color: var(--gs-accent); }
 .btn-add {
   padding: 10px 16px;
   color: white;
@@ -430,6 +460,7 @@ body {
 .sk .btn-add { background: var(--sk-accent); }
 .pn .btn-add { background: var(--pn-accent); }
 .cc .btn-add { background: var(--cc-accent); }
+.gs .btn-add { background: var(--gs-accent); }
 
 /* COMPRA */
 .compra-header {
@@ -475,6 +506,7 @@ body {
 .sk .compra-section-title { color: var(--sk-dim); }
 .pn .compra-section-title { color: var(--pn-dim); }
 .cc .compra-section-title { color: var(--cc-dim); }
+.gs .compra-section-title { color: var(--gs-dim); }
 .compra-item {
   display: flex;
   align-items: center;
@@ -488,6 +520,7 @@ body {
 .sk .compra-item { border: 1px solid var(--sk-border); }
 .pn .compra-item { border: 1px solid var(--pn-border); }
 .cc .compra-item { border: 1px solid var(--cc-border); }
+.gs .compra-item { border: 1px solid var(--gs-border); }
 .compra-item .ci-icon { font-size: 1.1rem; flex-shrink: 0; }
 .compra-item .ci-info { flex: 1; min-width: 0; }
 .compra-item .ci-name { font-size: .88rem; font-weight: 500; }
@@ -496,6 +529,7 @@ body {
 .sk .compra-item .ci-prov { color: var(--sk-dim); }
 .pn .compra-item .ci-prov { color: var(--pn-dim); }
 .cc .compra-item .ci-prov { color: var(--cc-dim); }
+.gs .compra-item .ci-prov { color: var(--gs-dim); }
 .compra-item .ci-qty {
   font-family: 'Syne', sans-serif;
   font-size: .82rem;
@@ -507,6 +541,7 @@ body {
 .sk .compra-item .ci-qty { color: var(--sk-accent); }
 .pn .compra-item .ci-qty { color: var(--pn-accent); }
 .cc .compra-item .ci-qty { color: var(--cc-accent); }
+.gs .compra-item .ci-qty { color: var(--gs-accent); }
 .compra-item.agotado-item {
   border-color: #ef9a9a !important;
   background: var(--rojo-suave);
@@ -521,6 +556,7 @@ body {
 .sk .empty-state { color: var(--sk-dim); }
 .pn .empty-state { color: var(--pn-dim); }
 .cc .empty-state { color: var(--cc-dim); }
+.gs .empty-state { color: var(--gs-dim); }
 
 /* FAB BAR */
 .fab-bar {
@@ -537,6 +573,7 @@ body {
 .sk-bar { background: rgba(253,245,240,.95); border-top: 1px solid var(--sk-border); }
 .pn-bar { background: rgba(253,248,240,.95); border-top: 1px solid var(--pn-border); }
 .cc-bar { background: rgba(240,244,248,.95); border-top: 1px solid var(--cc-border); }
+.gs-bar { background: rgba(250,246,238,.95); border-top: 1px solid var(--gs-border); }
 .fab {
   flex: 1;
   padding: 14px;
@@ -554,10 +591,12 @@ body {
 .fab-sk { background: var(--sk-accent); color: white; }
 .fab-pn { background: var(--pn-accent); color: white; }
 .fab-cc { background: var(--cc-accent); color: white; }
+.fab-gs { background: var(--gs-accent); color: white; }
 .fab-outline-fv { background: white; color: var(--fv-dim); border: 1.5px solid var(--fv-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
 .fab-outline-sk { background: white; color: var(--sk-dim); border: 1.5px solid var(--sk-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
 .fab-outline-pn { background: white; color: var(--pn-dim); border: 1.5px solid var(--pn-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
 .fab-outline-cc { background: white; color: var(--cc-dim); border: 1.5px solid var(--cc-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
+.fab-outline-gs { background: white; color: var(--gs-dim); border: 1.5px solid var(--gs-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
 
 /* BADGE */
 .badge-completo {
@@ -583,6 +622,7 @@ body {
   <button class="app-btn sk" onclick="switchApp('sk')">🥩 SU-KARNE</button>
   <button class="app-btn pn" onclick="switchApp('pn')">🧀 Piñalito</button>
   <button class="app-btn cc" onclick="switchApp('cc')">❄️ C. Congeladas</button>
+  <button class="app-btn gs" onclick="switchApp('gs')">🌾 Granos y Semillas</button>
 </div>
 
 <!-- APP 1: FRUTAS Y VERDURAS -->
@@ -733,6 +773,43 @@ body {
   </div>
 </div>
 
+<!-- APP 5: GRANOS Y SEMILLAS -->
+<div class="app gs" id="app-gs">
+  <div class="app-header">
+    <h1>🌾 Granos y Semillas</h1>
+    <div class="sub" id="gs-fecha"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="gsSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="gsSwitchTab('compra',this)">🛒 Lista de compra</button>
+  </div>
+  <div class="panel active" id="gs-tab-stock">
+    <div class="stats">
+      <div class="stat"><div class="n" id="gs-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="gs-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="gs-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="gs-st-agot">0</div><div class="l">Agotado</div></div>
+    </div>
+    <div class="badge-completo" id="gs-badge-ok">
+      <span class="emoji">✅</span>
+      <strong>¡Todo surtido!</strong>
+      <span>No hay productos pendientes</span>
+    </div>
+    <div id="gs-stock-list"></div>
+  </div>
+  <div class="panel" id="gs-tab-compra">
+    <div class="compra-header">
+      <h3>Lista para central</h3>
+      <button class="btn-wa" onclick="gsShareWA()">📲 WhatsApp</button>
+    </div>
+    <div id="gs-compra-list"></div>
+  </div>
+  <div class="fab-bar gs-bar" id="gs-fab" style="display:none">
+    <button class="fab fab-gs" onclick="gsSwitchTab('compra', document.querySelectorAll('#app-gs .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-gs" onclick="gsResetAll()">↺</button>
+  </div>
+</div>
+
 <script>
 // APP SWITCHER
 function switchApp(name) {
@@ -740,7 +817,7 @@ function switchApp(name) {
   document.querySelectorAll('.app-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('app-' + name).classList.add('active');
   document.querySelector('.app-btn.' + name).classList.add('active');
-  ['fv','sk','pn','cc'].forEach(function(n){
+  ['fv','sk','pn','cc','gs'].forEach(function(n){
     document.getElementById(n + '-fab').style.display = (n === name) ? 'flex' : 'none';
   });
 }
@@ -1154,14 +1231,85 @@ function ccDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;ccExtr
 function ccShareWA(){shareWA('❄️ LISTA CARNES CONGELADAS — CENTRAL DE ABASTOS',ccAllProducts,ccGetState);}
 function ccResetAll(){if(confirm('¿Limpiar el estado de Carnes Congeladas?')){ccState={};ccSave();ccRenderStock();}}
 
+// GRANOS Y SEMILLAS
+var GS_PRODUCTOS = [
+  {id:'gs-cacahuate-enchilado',icon:'🥜',nombre:'Cacahuate enchilado',cat:'granos',unidad:'kg'},
+  {id:'gs-cacahuate-garapinado',icon:'🥜',nombre:'Cacahuate garapiñado',cat:'granos',unidad:'kg'},
+  {id:'gs-cacahuate-sal',icon:'🥜',nombre:'Cacahuate con sal',cat:'granos',unidad:'kg'},
+  {id:'gs-cacahuate-chipotle',icon:'🥜',nombre:'Cacahuate chipotle',cat:'granos',unidad:'kg'},
+  {id:'gs-cacahuate-natural',icon:'🥜',nombre:'Cacahuate natural',cat:'granos',unidad:'kg'},
+  {id:'gs-mango-enchilado',icon:'🥭',nombre:'Mango enchilado',cat:'granos',unidad:'kg'},
+  {id:'gs-granola',icon:'🥣',nombre:'Granola',cat:'granos',unidad:'kg'},
+  {id:'gs-pistache',icon:'🥜',nombre:'Pistache',cat:'granos',unidad:'kg'},
+  {id:'gs-chia',icon:'🌱',nombre:'Chía',cat:'granos',unidad:'kg'},
+  {id:'gs-uva-pasa',icon:'🍇',nombre:'Uva pasa',cat:'granos',unidad:'kg'},
+  {id:'gs-ciruela-pasa',icon:'🟣',nombre:'Ciruela pasa',cat:'granos',unidad:'kg'},
+  {id:'gs-almendra',icon:'🌰',nombre:'Almendra',cat:'granos',unidad:'kg'},
+  {id:'gs-nuez',icon:'🌰',nombre:'Nuez',cat:'granos',unidad:'kg'},
+  {id:'gs-chilimon',icon:'🌶️',nombre:'Chilimón',cat:'granos',unidad:'kg'},
+  {id:'gs-chile-pasilla',icon:'🌶️',nombre:'Chile pasilla',cat:'granos',unidad:'kg'},
+  {id:'gs-chile-guajillo',icon:'🌶️',nombre:'Chile guajillo',cat:'granos',unidad:'kg'},
+  {id:'gs-chile-arbol',icon:'🌶️',nombre:'Chile de árbol',cat:'granos',unidad:'kg'},
+  {id:'gs-crema-trigo',icon:'🌾',nombre:'Crema de trigo',cat:'granos',unidad:'kg'},
+  {id:'gs-pasta-mini-rueda',icon:'🍝',nombre:'Pasta mini rueda',cat:'granos',unidad:'kg'},
+  {id:'gs-lentejas',icon:'🫘',nombre:'Lentejas',cat:'granos',unidad:'kg'},
+  {id:'gs-garbanzo',icon:'🫘',nombre:'Garbanzo',cat:'granos',unidad:'kg'},
+  {id:'gs-maiz-palomero',icon:'🌽',nombre:'Maíz palomero',cat:'granos',unidad:'kg'},
+  {id:'gs-alpiste',icon:'🌾',nombre:'Alpiste',cat:'granos',unidad:'kg'},
+  {id:'gs-soya',icon:'🌱',nombre:'Soya',cat:'granos',unidad:'kg'},
+  {id:'gs-semilla-girasol',icon:'🌻',nombre:'Semilla de girasol',cat:'granos',unidad:'kg'},
+  {id:'gs-arroz-paisa',icon:'🍚',nombre:'Arroz paisa',cat:'granos',unidad:'kg'},
+  {id:'gs-frijol-pinto',icon:'🫘',nombre:'Frijol pinto',cat:'granos',unidad:'kg'},
+  {id:'gs-frijol-mayocoba',icon:'🫘',nombre:'Frijol mayocoba',cat:'granos',unidad:'kg'},
+  {id:'gs-azucar',icon:'🧂',nombre:'Azúcar',cat:'granos',unidad:'kg'},
+  {id:'gs-piloncillo',icon:'🟤',nombre:'Piloncillo',cat:'granos',unidad:'kg'},
+  {id:'gs-horchata',icon:'🥛',nombre:'Horchata',cat:'granos',unidad:'kg'},
+  {id:'gs-cebada',icon:'🌾',nombre:'Cebada',cat:'granos',unidad:'kg'}
+];
+var gsState={},gsExtra=[];
+function gsLoad(){try{var s=localStorage.getItem('gs_state');if(s)gsState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('gs_extra');if(s2)gsExtra=JSON.parse(s2);}catch(e){}}
+function gsSave(){try{localStorage.setItem('gs_state',JSON.stringify(gsState));}catch(e){}}
+function gsSaveExtra(){try{localStorage.setItem('gs_extra',JSON.stringify(gsExtra));}catch(e){}}
+function gsGetState(id){return gsState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'kg',precio:'',proveedor:'',nota:''};}
+function gsAllProducts(){return GS_PRODUCTOS.concat(gsExtra);}
+function gsSwitchTab(name,btn){
+  document.querySelectorAll('#app-gs .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-gs .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('gs-tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='compra')renderCompra('gs-compra-list',gsAllProducts,gsGetState,'gs'); else gsRenderStock();
+}
+function gsRenderStock(){
+  var list=document.getElementById('gs-stock-list');
+  list.innerHTML='<div class="section-label">🌾 Granos y Semillas</div>'+
+    GS_PRODUCTOS.map(function(p){return buildCard(p,gsGetState,'gs',false);}).join('')+
+    gsExtra.map(function(p){return buildCard(p,gsGetState,'gs',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="gs-add-granos" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')gsAddProd()"><button class="btn-add" onclick="gsAddProd()">+</button></div>';
+  gsUpdateStats();
+}
+function gsToggleCard(id){if(!gsState[id])gsState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};gsState[id]._open=!gsState[id]._open;gsSave();var card=document.getElementById('pc-gs-'+id);if(card)card.classList.toggle('open');}
+function gsSetField(id,field,val){if(!gsState[id])gsState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};gsState[id][field]=val;gsSave();gsUpdateStats();}
+function gsSetStatus(id,status){if(!gsState[id])gsState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};gsState[id].status=status;gsState[id]._open=true;gsSave();setStatusCard('pc-gs-'+id,status);gsUpdateStats();}
+function gsUpdateStats(){
+  var all=gsAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=gsGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('gs-st-total').textContent=all.length;document.getElementById('gs-st-ok').textContent=ok;document.getElementById('gs-st-needs').textContent=needs;document.getElementById('gs-st-agot').textContent=agot;
+  var badge=document.getElementById('gs-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+}
+function gsAddProd(){var input=document.getElementById('gs-add-granos');var nombre=input.value.trim();if(!nombre)return;var id='gsx-'+Date.now();gsExtra.push({id:id,icon:'🌾',nombre:nombre,cat:'granos',unidad:'kg'});gsSaveExtra();input.value='';gsRenderStock();}
+function gsDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;gsExtra=gsExtra.filter(function(p){return p.id!==id;});delete gsState[id];gsSaveExtra();gsSave();gsRenderStock();}
+function gsShareWA(){shareWA('🌾 LISTA GRANOS Y SEMILLAS — CENTRAL DE ABASTOS',gsAllProducts,gsGetState);}
+function gsResetAll(){if(confirm('¿Limpiar el estado de Granos y Semillas?')){gsState={};gsSave();gsRenderStock();}}
+
 // INIT
 var hoy = new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
-['fv','sk','pn','cc'].forEach(function(n){ document.getElementById(n+'-fecha').textContent = hoy; });
+['fv','sk','pn','cc','gs'].forEach(function(n){ document.getElementById(n+'-fecha').textContent = hoy; });
 
 fvLoad(); fvRenderStock();
 skLoad(); skRenderStock();
 pnLoad(); pnRenderStock();
 ccLoad(); ccRenderStock();
+gsLoad(); gsRenderStock();
 </script>
 
 </body>
