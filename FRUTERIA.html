@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -54,6 +55,11 @@
   --gs-dim: #9c8358;
   --gs-texto: #2e2410;
   --gs-header: #6d4c1a;
+  --so-bg:#f0f4f8;--so-border:#b0c4d8;--so-accent:#0d47a1;--so-accent2:#0d47a1;--so-suave:#e3f2fd;--so-dim:#546e7a;--so-texto:#0a1929;--so-header:#01579b;
+  --ef-bg:#fffbf0;--ef-border:#f0dca0;--ef-accent:#a67c00;--ef-accent2:#a67c00;--ef-suave:#fff8e1;--ef-dim:#8d7a45;--ef-texto:#2e2508;--ef-header:#8a6400;
+  --cm-bg:#fdf2f5;--cm-border:#e8c3cf;--cm-accent:#ad1457;--cm-accent2:#ad1457;--cm-suave:#fce4ec;--cm-dim:#8e5a6b;--cm-texto:#2c0f18;--cm-header:#880e4f;
+  --px-bg:#f5f3f8;--px-border:#cfc6dc;--px-accent:#5e35b1;--px-accent2:#5e35b1;--px-suave:#ede7f6;--px-dim:#6f6582;--px-texto:#1d1530;--px-header:#4527a0;
+  --cv-bg:#f0f8f7;--cv-border:#b7dbd6;--cv-accent:#00796b;--cv-accent2:#00796b;--cv-suave:#e0f2f1;--cv-dim:#5b7f7a;--cv-texto:#0b2724;--cv-header:#004d40;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -75,8 +81,8 @@ body {
   overflow-x: auto;
 }
 .app-btn {
-  flex: 1;
-  padding: 15px 8px;
+  flex: 1 0 auto;
+  padding: 15px 14px;
   text-align: center;
   font-family: 'Syne', sans-serif;
   font-size: .78rem;
@@ -612,6 +618,151 @@ body {
 .badge-completo .emoji { font-size: 1.8rem; display: block; margin-bottom: 5px; }
 .badge-completo strong { font-family: 'Syne', sans-serif; font-size: .92rem; color: #2e7d32; display: block; }
 .badge-completo span { font-size: .75rem; color: var(--fv-dim); }
+.app-btn.so { background: var(--so-header); color: rgba(255,255,255,.5); }
+.app-btn.so.active { color: #fff; }
+.app-btn.so.active::after { background: #90caf9; transform: scaleX(1); }
+.so .app-header { background: var(--so-header); }
+.so .tabs { background: var(--so-header); }
+.so .panel { background: var(--so-bg); padding: 14px 14px 0; }
+.so .stat { border: 1.5px solid var(--so-border); }
+.so .stat .n { color: var(--so-accent); }
+.so .stat .l { color: var(--so-dim); }
+.so .section-label { color: var(--so-accent); }
+.so .section-label::after { background: var(--so-accent); }
+.so .pcard { border: 1.5px solid var(--so-border); }
+.so .pcard-body { border-top: 1px solid var(--so-border); }
+.so .pfield-label { color: var(--so-dim); }
+.so .pfield-input { border: 1.5px solid var(--so-border); color: var(--so-texto); background: var(--so-bg); }
+.so .pfield-input:focus { border-color: var(--so-accent); }
+.so .status-label-small { color: var(--so-dim); }
+.so .sbtn { border-color: var(--so-border); color: var(--so-dim); }
+.so .add-input { border: 1.5px dashed var(--so-border); color: var(--so-texto); }
+.so .add-input:focus { border-color: var(--so-accent); }
+.so .btn-add { background: var(--so-accent); }
+.so .compra-section-title { color: var(--so-dim); }
+.so .compra-item { border: 1px solid var(--so-border); }
+.so .compra-item .ci-prov { color: var(--so-dim); }
+.so .compra-item .ci-qty { color: var(--so-accent); }
+.so .empty-state { color: var(--so-dim); }
+.so-bar { background: var(--so-bg); border-top: 1px solid var(--so-border); }
+.fab-so { background: var(--so-accent); color: white; }
+.fab-outline-so { background: white; color: var(--so-dim); border: 1.5px solid var(--so-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
+.app-btn.ef { background: var(--ef-header); color: rgba(255,255,255,.5); }
+.app-btn.ef.active { color: #fff; }
+.app-btn.ef.active::after { background: #ffe082; transform: scaleX(1); }
+.ef .app-header { background: var(--ef-header); }
+.ef .tabs { background: var(--ef-header); }
+.ef .panel { background: var(--ef-bg); padding: 14px 14px 0; }
+.ef .stat { border: 1.5px solid var(--ef-border); }
+.ef .stat .n { color: var(--ef-accent); }
+.ef .stat .l { color: var(--ef-dim); }
+.ef .section-label { color: var(--ef-accent); }
+.ef .section-label::after { background: var(--ef-accent); }
+.ef .pcard { border: 1.5px solid var(--ef-border); }
+.ef .pcard-body { border-top: 1px solid var(--ef-border); }
+.ef .pfield-label { color: var(--ef-dim); }
+.ef .pfield-input { border: 1.5px solid var(--ef-border); color: var(--ef-texto); background: var(--ef-bg); }
+.ef .pfield-input:focus { border-color: var(--ef-accent); }
+.ef .status-label-small { color: var(--ef-dim); }
+.ef .sbtn { border-color: var(--ef-border); color: var(--ef-dim); }
+.ef .add-input { border: 1.5px dashed var(--ef-border); color: var(--ef-texto); }
+.ef .add-input:focus { border-color: var(--ef-accent); }
+.ef .btn-add { background: var(--ef-accent); }
+.ef .compra-section-title { color: var(--ef-dim); }
+.ef .compra-item { border: 1px solid var(--ef-border); }
+.ef .compra-item .ci-prov { color: var(--ef-dim); }
+.ef .compra-item .ci-qty { color: var(--ef-accent); }
+.ef .empty-state { color: var(--ef-dim); }
+.ef-bar { background: var(--ef-bg); border-top: 1px solid var(--ef-border); }
+.fab-ef { background: var(--ef-accent); color: white; }
+.fab-outline-ef { background: white; color: var(--ef-dim); border: 1.5px solid var(--ef-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
+.app-btn.cm { background: var(--cm-header); color: rgba(255,255,255,.5); }
+.app-btn.cm.active { color: #fff; }
+.app-btn.cm.active::after { background: #f48fb1; transform: scaleX(1); }
+.cm .app-header { background: var(--cm-header); }
+.cm .tabs { background: var(--cm-header); }
+.cm .panel { background: var(--cm-bg); padding: 14px 14px 0; }
+.cm .stat { border: 1.5px solid var(--cm-border); }
+.cm .stat .n { color: var(--cm-accent); }
+.cm .stat .l { color: var(--cm-dim); }
+.cm .section-label { color: var(--cm-accent); }
+.cm .section-label::after { background: var(--cm-accent); }
+.cm .pcard { border: 1.5px solid var(--cm-border); }
+.cm .pcard-body { border-top: 1px solid var(--cm-border); }
+.cm .pfield-label { color: var(--cm-dim); }
+.cm .pfield-input { border: 1.5px solid var(--cm-border); color: var(--cm-texto); background: var(--cm-bg); }
+.cm .pfield-input:focus { border-color: var(--cm-accent); }
+.cm .status-label-small { color: var(--cm-dim); }
+.cm .sbtn { border-color: var(--cm-border); color: var(--cm-dim); }
+.cm .add-input { border: 1.5px dashed var(--cm-border); color: var(--cm-texto); }
+.cm .add-input:focus { border-color: var(--cm-accent); }
+.cm .btn-add { background: var(--cm-accent); }
+.cm .compra-section-title { color: var(--cm-dim); }
+.cm .compra-item { border: 1px solid var(--cm-border); }
+.cm .compra-item .ci-prov { color: var(--cm-dim); }
+.cm .compra-item .ci-qty { color: var(--cm-accent); }
+.cm .empty-state { color: var(--cm-dim); }
+.cm-bar { background: var(--cm-bg); border-top: 1px solid var(--cm-border); }
+.fab-cm { background: var(--cm-accent); color: white; }
+.fab-outline-cm { background: white; color: var(--cm-dim); border: 1.5px solid var(--cm-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
+.app-btn.px { background: var(--px-header); color: rgba(255,255,255,.5); }
+.app-btn.px.active { color: #fff; }
+.app-btn.px.active::after { background: #b39ddb; transform: scaleX(1); }
+.px .app-header { background: var(--px-header); }
+.px .tabs { background: var(--px-header); }
+.px .panel { background: var(--px-bg); padding: 14px 14px 0; }
+.px .stat { border: 1.5px solid var(--px-border); }
+.px .stat .n { color: var(--px-accent); }
+.px .stat .l { color: var(--px-dim); }
+.px .section-label { color: var(--px-accent); }
+.px .section-label::after { background: var(--px-accent); }
+.px .pcard { border: 1.5px solid var(--px-border); }
+.px .pcard-body { border-top: 1px solid var(--px-border); }
+.px .pfield-label { color: var(--px-dim); }
+.px .pfield-input { border: 1.5px solid var(--px-border); color: var(--px-texto); background: var(--px-bg); }
+.px .pfield-input:focus { border-color: var(--px-accent); }
+.px .status-label-small { color: var(--px-dim); }
+.px .sbtn { border-color: var(--px-border); color: var(--px-dim); }
+.px .add-input { border: 1.5px dashed var(--px-border); color: var(--px-texto); }
+.px .add-input:focus { border-color: var(--px-accent); }
+.px .btn-add { background: var(--px-accent); }
+.px .compra-section-title { color: var(--px-dim); }
+.px .compra-item { border: 1px solid var(--px-border); }
+.px .compra-item .ci-prov { color: var(--px-dim); }
+.px .compra-item .ci-qty { color: var(--px-accent); }
+.px .empty-state { color: var(--px-dim); }
+.px-bar { background: var(--px-bg); border-top: 1px solid var(--px-border); }
+.fab-px { background: var(--px-accent); color: white; }
+.fab-outline-px { background: white; color: var(--px-dim); border: 1.5px solid var(--px-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
+.app-btn.cv { background: var(--cv-header); color: rgba(255,255,255,.5); }
+.app-btn.cv.active { color: #fff; }
+.app-btn.cv.active::after { background: #80cbc4; transform: scaleX(1); }
+.cv .app-header { background: var(--cv-header); }
+.cv .tabs { background: var(--cv-header); }
+.cv .panel { background: var(--cv-bg); padding: 14px 14px 0; }
+.cv .stat { border: 1.5px solid var(--cv-border); }
+.cv .stat .n { color: var(--cv-accent); }
+.cv .stat .l { color: var(--cv-dim); }
+.cv .section-label { color: var(--cv-accent); }
+.cv .section-label::after { background: var(--cv-accent); }
+.cv .pcard { border: 1.5px solid var(--cv-border); }
+.cv .pcard-body { border-top: 1px solid var(--cv-border); }
+.cv .pfield-label { color: var(--cv-dim); }
+.cv .pfield-input { border: 1.5px solid var(--cv-border); color: var(--cv-texto); background: var(--cv-bg); }
+.cv .pfield-input:focus { border-color: var(--cv-accent); }
+.cv .status-label-small { color: var(--cv-dim); }
+.cv .sbtn { border-color: var(--cv-border); color: var(--cv-dim); }
+.cv .add-input { border: 1.5px dashed var(--cv-border); color: var(--cv-texto); }
+.cv .add-input:focus { border-color: var(--cv-accent); }
+.cv .btn-add { background: var(--cv-accent); }
+.cv .compra-section-title { color: var(--cv-dim); }
+.cv .compra-item { border: 1px solid var(--cv-border); }
+.cv .compra-item .ci-prov { color: var(--cv-dim); }
+.cv .compra-item .ci-qty { color: var(--cv-accent); }
+.cv .empty-state { color: var(--cv-dim); }
+.cv-bar { background: var(--cv-bg); border-top: 1px solid var(--cv-border); }
+.fab-cv { background: var(--cv-accent); color: white; }
+.fab-outline-cv { background: white; color: var(--cv-dim); border: 1.5px solid var(--cv-border); flex: 0 0 auto; padding: 14px 18px; font-size: 1rem; }
 </style>
 </head>
 <body>
@@ -619,10 +770,13 @@ body {
 <!-- APP SWITCHER -->
 <div class="app-switcher">
   <button class="app-btn fv active" onclick="switchApp('fv')">🥦 Frutas y Verduras</button>
-  <button class="app-btn sk" onclick="switchApp('sk')">🥩 SU-KARNE</button>
-  <button class="app-btn pn" onclick="switchApp('pn')">🧀 Piñalito</button>
-  <button class="app-btn cc" onclick="switchApp('cc')">❄️ C. Congeladas</button>
-  <button class="app-btn gs" onclick="switchApp('gs')">🌾 Granos y Semillas</button>
+  <button class="app-btn sk" onclick="switchApp('sk')">🥩 SU CARNE</button>
+  <button class="app-btn so" onclick="switchApp('so')">🐟 SOLES</button>
+  <button class="app-btn ef" onclick="switchApp('ef')">🍟 FOOD</button>
+  <button class="app-btn cm" onclick="switchApp('cm')">🐷 CARNE MART</button>
+  <button class="app-btn px" onclick="switchApp('px')">📦 PROVEEDOR EXTERNO</button>
+  <button class="app-btn pn" onclick="switchApp('pn')">🧈 PIÑALITO</button>
+  <button class="app-btn cv" onclick="switchApp('cv')">🧀 CREMERÍA CEVES</button>
 </div>
 
 <!-- APP 1: FRUTAS Y VERDURAS -->
@@ -662,10 +816,10 @@ body {
   </div>
 </div>
 
-<!-- APP 2: SU-KARNE -->
+<!-- SU CARNE -->
 <div class="app sk" id="app-sk">
   <div class="app-header">
-    <h1>🥩 SU-KARNE</h1>
+    <h1>🥩 SU CARNE</h1>
     <div class="sub" id="sk-fecha"></div>
   </div>
   <div class="tabs">
@@ -688,7 +842,7 @@ body {
   </div>
   <div class="panel" id="sk-tab-compra">
     <div class="compra-header">
-      <h3>Lista para central</h3>
+      <h3>Pedido SU CARNE</h3>
       <button class="btn-wa" onclick="skShareWA()">📲 WhatsApp</button>
     </div>
     <div id="sk-compra-list"></div>
@@ -699,10 +853,158 @@ body {
   </div>
 </div>
 
-<!-- APP 3: PIÑALITO -->
+<!-- SOLES -->
+<div class="app so" id="app-so">
+  <div class="app-header">
+    <h1>🐟 SOLES</h1>
+    <div class="sub" id="so-fecha"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="soSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="soSwitchTab('compra',this)">🛒 Lista de compra</button>
+  </div>
+  <div class="panel active" id="so-tab-stock">
+    <div class="stats">
+      <div class="stat"><div class="n" id="so-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="so-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="so-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="so-st-agot">0</div><div class="l">Agotado</div></div>
+    </div>
+    <div class="badge-completo" id="so-badge-ok">
+      <span class="emoji">✅</span>
+      <strong>¡Todo surtido!</strong>
+      <span>No hay productos pendientes</span>
+    </div>
+    <div id="so-stock-list"></div>
+  </div>
+  <div class="panel" id="so-tab-compra">
+    <div class="compra-header">
+      <h3>Pedido SOLES</h3>
+      <button class="btn-wa" onclick="soShareWA()">📲 WhatsApp</button>
+    </div>
+    <div id="so-compra-list"></div>
+  </div>
+  <div class="fab-bar so-bar" id="so-fab" style="display:none">
+    <button class="fab fab-so" onclick="soSwitchTab('compra', document.querySelectorAll('#app-so .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-so" onclick="soResetAll()">↺</button>
+  </div>
+</div>
+
+<!-- FOOD -->
+<div class="app ef" id="app-ef">
+  <div class="app-header">
+    <h1>🍟 FOOD</h1>
+    <div class="sub" id="ef-fecha"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="efSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="efSwitchTab('compra',this)">🛒 Lista de compra</button>
+  </div>
+  <div class="panel active" id="ef-tab-stock">
+    <div class="stats">
+      <div class="stat"><div class="n" id="ef-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="ef-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="ef-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="ef-st-agot">0</div><div class="l">Agotado</div></div>
+    </div>
+    <div class="badge-completo" id="ef-badge-ok">
+      <span class="emoji">✅</span>
+      <strong>¡Todo surtido!</strong>
+      <span>No hay productos pendientes</span>
+    </div>
+    <div id="ef-stock-list"></div>
+  </div>
+  <div class="panel" id="ef-tab-compra">
+    <div class="compra-header">
+      <h3>Pedido FOOD</h3>
+      <button class="btn-wa" onclick="efShareWA()">📲 WhatsApp</button>
+    </div>
+    <div id="ef-compra-list"></div>
+  </div>
+  <div class="fab-bar ef-bar" id="ef-fab" style="display:none">
+    <button class="fab fab-ef" onclick="efSwitchTab('compra', document.querySelectorAll('#app-ef .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-ef" onclick="efResetAll()">↺</button>
+  </div>
+</div>
+
+<!-- CARNE MART -->
+<div class="app cm" id="app-cm">
+  <div class="app-header">
+    <h1>🐷 CARNE MART</h1>
+    <div class="sub" id="cm-fecha"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="cmSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="cmSwitchTab('compra',this)">🛒 Lista de compra</button>
+  </div>
+  <div class="panel active" id="cm-tab-stock">
+    <div class="stats">
+      <div class="stat"><div class="n" id="cm-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="cm-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="cm-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="cm-st-agot">0</div><div class="l">Agotado</div></div>
+    </div>
+    <div class="badge-completo" id="cm-badge-ok">
+      <span class="emoji">✅</span>
+      <strong>¡Todo surtido!</strong>
+      <span>No hay productos pendientes</span>
+    </div>
+    <div id="cm-stock-list"></div>
+  </div>
+  <div class="panel" id="cm-tab-compra">
+    <div class="compra-header">
+      <h3>Pedido CARNE MART</h3>
+      <button class="btn-wa" onclick="cmShareWA()">📲 WhatsApp</button>
+    </div>
+    <div id="cm-compra-list"></div>
+  </div>
+  <div class="fab-bar cm-bar" id="cm-fab" style="display:none">
+    <button class="fab fab-cm" onclick="cmSwitchTab('compra', document.querySelectorAll('#app-cm .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-cm" onclick="cmResetAll()">↺</button>
+  </div>
+</div>
+
+<!-- PROVEEDOR EXTERNO -->
+<div class="app px" id="app-px">
+  <div class="app-header">
+    <h1>📦 PROVEEDOR EXTERNO</h1>
+    <div class="sub" id="px-fecha"></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="pxSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="pxSwitchTab('compra',this)">🛒 Lista de compra</button>
+  </div>
+  <div class="panel active" id="px-tab-stock">
+    <div class="stats">
+      <div class="stat"><div class="n" id="px-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="px-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="px-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="px-st-agot">0</div><div class="l">Agotado</div></div>
+    </div>
+    <div class="badge-completo" id="px-badge-ok">
+      <span class="emoji">✅</span>
+      <strong>¡Todo surtido!</strong>
+      <span>No hay productos pendientes</span>
+    </div>
+    <div id="px-stock-list"></div>
+  </div>
+  <div class="panel" id="px-tab-compra">
+    <div class="compra-header">
+      <h3>Pedido PROVEEDOR EXTERNO</h3>
+      <button class="btn-wa" onclick="pxShareWA()">📲 WhatsApp</button>
+    </div>
+    <div id="px-compra-list"></div>
+  </div>
+  <div class="fab-bar px-bar" id="px-fab" style="display:none">
+    <button class="fab fab-px" onclick="pxSwitchTab('compra', document.querySelectorAll('#app-px .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-px" onclick="pxResetAll()">↺</button>
+  </div>
+</div>
+
+<!-- PIÑALITO -->
 <div class="app pn" id="app-pn">
   <div class="app-header">
-    <h1>🧀 Piñalito</h1>
+    <h1>🧈 PIÑALITO</h1>
     <div class="sub" id="pn-fecha"></div>
   </div>
   <div class="tabs">
@@ -725,7 +1027,7 @@ body {
   </div>
   <div class="panel" id="pn-tab-compra">
     <div class="compra-header">
-      <h3>Lista para central</h3>
+      <h3>Pedido PIÑALITO</h3>
       <button class="btn-wa" onclick="pnShareWA()">📲 WhatsApp</button>
     </div>
     <div id="pn-compra-list"></div>
@@ -736,77 +1038,40 @@ body {
   </div>
 </div>
 
-<!-- APP 4: CARNES CONGELADAS -->
-<div class="app cc" id="app-cc">
+<!-- CREMERÍA CEVES -->
+<div class="app cv" id="app-cv">
   <div class="app-header">
-    <h1>❄️ Carnes Congeladas</h1>
-    <div class="sub" id="cc-fecha"></div>
+    <h1>🧀 CREMERÍA CEVES</h1>
+    <div class="sub" id="cv-fecha"></div>
   </div>
   <div class="tabs">
-    <button class="tab active" onclick="ccSwitchTab('stock',this)">📋 Stock</button>
-    <button class="tab" onclick="ccSwitchTab('compra',this)">🛒 Lista de compra</button>
+    <button class="tab active" onclick="cvSwitchTab('stock',this)">📋 Stock</button>
+    <button class="tab" onclick="cvSwitchTab('compra',this)">🛒 Lista de compra</button>
   </div>
-  <div class="panel active" id="cc-tab-stock">
+  <div class="panel active" id="cv-tab-stock">
     <div class="stats">
-      <div class="stat"><div class="n" id="cc-st-total">0</div><div class="l">Total</div></div>
-      <div class="stat ok"><div class="n" id="cc-st-ok">0</div><div class="l">Bien</div></div>
-      <div class="stat warn"><div class="n" id="cc-st-needs">0</div><div class="l">Pedir</div></div>
-      <div class="stat bad"><div class="n" id="cc-st-agot">0</div><div class="l">Agotado</div></div>
+      <div class="stat"><div class="n" id="cv-st-total">0</div><div class="l">Total</div></div>
+      <div class="stat ok"><div class="n" id="cv-st-ok">0</div><div class="l">Bien</div></div>
+      <div class="stat warn"><div class="n" id="cv-st-needs">0</div><div class="l">Pedir</div></div>
+      <div class="stat bad"><div class="n" id="cv-st-agot">0</div><div class="l">Agotado</div></div>
     </div>
-    <div class="badge-completo" id="cc-badge-ok">
+    <div class="badge-completo" id="cv-badge-ok">
       <span class="emoji">✅</span>
       <strong>¡Todo surtido!</strong>
       <span>No hay productos pendientes</span>
     </div>
-    <div id="cc-stock-list"></div>
+    <div id="cv-stock-list"></div>
   </div>
-  <div class="panel" id="cc-tab-compra">
+  <div class="panel" id="cv-tab-compra">
     <div class="compra-header">
-      <h3>Lista para central</h3>
-      <button class="btn-wa" onclick="ccShareWA()">📲 WhatsApp</button>
+      <h3>Pedido CREMERÍA CEVES</h3>
+      <button class="btn-wa" onclick="cvShareWA()">📲 WhatsApp</button>
     </div>
-    <div id="cc-compra-list"></div>
+    <div id="cv-compra-list"></div>
   </div>
-  <div class="fab-bar cc-bar" id="cc-fab" style="display:none">
-    <button class="fab fab-cc" onclick="ccSwitchTab('compra', document.querySelectorAll('#app-cc .tab')[1])">🛒 Ver lista de compra</button>
-    <button class="fab fab-outline-cc" onclick="ccResetAll()">↺</button>
-  </div>
-</div>
-
-<!-- APP 5: GRANOS Y SEMILLAS -->
-<div class="app gs" id="app-gs">
-  <div class="app-header">
-    <h1>🌾 Granos y Semillas</h1>
-    <div class="sub" id="gs-fecha"></div>
-  </div>
-  <div class="tabs">
-    <button class="tab active" onclick="gsSwitchTab('stock',this)">📋 Stock</button>
-    <button class="tab" onclick="gsSwitchTab('compra',this)">🛒 Lista de compra</button>
-  </div>
-  <div class="panel active" id="gs-tab-stock">
-    <div class="stats">
-      <div class="stat"><div class="n" id="gs-st-total">0</div><div class="l">Total</div></div>
-      <div class="stat ok"><div class="n" id="gs-st-ok">0</div><div class="l">Bien</div></div>
-      <div class="stat warn"><div class="n" id="gs-st-needs">0</div><div class="l">Pedir</div></div>
-      <div class="stat bad"><div class="n" id="gs-st-agot">0</div><div class="l">Agotado</div></div>
-    </div>
-    <div class="badge-completo" id="gs-badge-ok">
-      <span class="emoji">✅</span>
-      <strong>¡Todo surtido!</strong>
-      <span>No hay productos pendientes</span>
-    </div>
-    <div id="gs-stock-list"></div>
-  </div>
-  <div class="panel" id="gs-tab-compra">
-    <div class="compra-header">
-      <h3>Lista para central</h3>
-      <button class="btn-wa" onclick="gsShareWA()">📲 WhatsApp</button>
-    </div>
-    <div id="gs-compra-list"></div>
-  </div>
-  <div class="fab-bar gs-bar" id="gs-fab" style="display:none">
-    <button class="fab fab-gs" onclick="gsSwitchTab('compra', document.querySelectorAll('#app-gs .tab')[1])">🛒 Ver lista de compra</button>
-    <button class="fab fab-outline-gs" onclick="gsResetAll()">↺</button>
+  <div class="fab-bar cv-bar" id="cv-fab" style="display:none">
+    <button class="fab fab-cv" onclick="cvSwitchTab('compra', document.querySelectorAll('#app-cv .tab')[1])">🛒 Ver lista de compra</button>
+    <button class="fab fab-outline-cv" onclick="cvResetAll()">↺</button>
   </div>
 </div>
 
@@ -817,7 +1082,7 @@ function switchApp(name) {
   document.querySelectorAll('.app-btn').forEach(function(b){ b.classList.remove('active'); });
   document.getElementById('app-' + name).classList.add('active');
   document.querySelector('.app-btn.' + name).classList.add('active');
-  ['fv','sk','pn','cc','gs'].forEach(function(n){
+  ['fv','sk','so','ef','cm','px','pn','cv'].forEach(function(n){
     document.getElementById(n + '-fab').style.display = (n === name) ? 'flex' : 'none';
   });
 }
@@ -828,7 +1093,7 @@ function buildCard(p, getStateFn, prefix, isExtra) {
   var statusClass = s.status === 'ok' ? 'ok' : s.status === 'needs' ? 'needs' : s.status === 'agotado' ? 'agotado' : '';
   var statusLabel = s.status === 'ok' ? '✓ Bien' : s.status === 'needs' ? '⚠ Pedir' : s.status === 'agotado' ? '✗ Agotado' : '';
   var isOpen = s._open ? 'open' : '';
-  var uComp = s.unidad_compra || 'kg';
+  var uComp = s.unidad_compra || p.unidad || 'kg';
   var sid = prefix + '-' + p.id;
   var deleteBtn = isExtra ? '<button class="btn-delete" onclick="' + prefix + 'DeleteProd(\'' + p.id + '\')">🗑 Eliminar producto</button>' : '';
   return '<div class="pcard ' + statusClass + ' ' + isOpen + '" id="pc-' + sid + '">' +
@@ -978,6 +1243,7 @@ function shareWA(title, getAllFn, getStateFn) {
 // FRUTAS Y VERDURAS
 var FV_PRODUCTOS = [
   {id:'acelga',icon:'🥬',nombre:'Acelga',cat:'verduras',unidad:'mano'},
+  {id:'aguacate',icon:'🥑',nombre:'Aguacate',cat:'verduras',unidad:'kg'},
   {id:'ajo',icon:'🧄',nombre:'Ajo',cat:'verduras',unidad:'kg'},
   {id:'apio',icon:'🌿',nombre:'Apio',cat:'verduras',unidad:'mano'},
   {id:'betabel',icon:'🟣',nombre:'Betabel',cat:'verduras',unidad:'kg'},
@@ -986,6 +1252,7 @@ var FV_PRODUCTOS = [
   {id:'cebolla-b',icon:'🧅',nombre:'Cebolla blanca',cat:'verduras',unidad:'kg'},
   {id:'cebolla-c',icon:'🧅',nombre:'Cebolla cambray',cat:'verduras',unidad:'mano'},
   {id:'cebolla-m',icon:'🧅',nombre:'Cebolla morada',cat:'verduras',unidad:'kg'},
+  {id:'champinon',icon:'🍄',nombre:'Champiñón',cat:'verduras',unidad:'kg'},
   {id:'chayote',icon:'🥬',nombre:'Chayote',cat:'verduras',unidad:'pza'},
   {id:'caribe',icon:'🌶️',nombre:'Chile caribe',cat:'verduras',unidad:'kg'},
   {id:'habanero',icon:'🌶️',nombre:'Chile habanero',cat:'verduras',unidad:'kg'},
@@ -1028,10 +1295,10 @@ var FV_PRODUCTOS = [
   {id:'naranja',icon:'🍊',nombre:'Naranja',cat:'frutas',unidad:'kg'},
   {id:'papaya',icon:'🍈',nombre:'Papaya',cat:'frutas',unidad:'kg'},
   {id:'pera',icon:'🍐',nombre:'Pera',cat:'frutas',unidad:'kg'},
-  {id:'pina',icon:'🍍',nombre:'Piña',cat:'frutas',unidad:'pza'},
+  {id:'pina',icon:'🍍',nombre:'Piña miel',cat:'frutas',unidad:'pza'},
   {id:'platano',icon:'🍌',nombre:'Plátano',cat:'frutas',unidad:'kg'},
-  {id:'uva',icon:'🍇',nombre:'Uva',cat:'frutas',unidad:'kg'},
-  {id:'uva-verde',icon:'🍈',nombre:'Uva verde',cat:'frutas',unidad:'kg'}
+  {id:'uva',icon:'🍇',nombre:'Uva roja',cat:'frutas',unidad:'kg'},
+  {id:'uva-verde',icon:'🍇',nombre:'Uva verde',cat:'frutas',unidad:'kg'}
 ];
 var fvState = {}, fvExtra = [];
 function fvLoad() {
@@ -1099,20 +1366,21 @@ function fvDeleteProd(id) {
 function fvShareWA() { shareWA('🥦 LISTA FRUTAS Y VERDURAS — CENTRAL',fvAllProducts,fvGetState); }
 function fvResetAll() { if(confirm('¿Limpiar el estado de Frutas y Verduras?')){fvState={};fvSave();fvRenderStock();} }
 
-// SU-KARNE
+// SU CARNE
 var SK_PRODUCTOS = [
-  {id:'pulpa-taquera',icon:'🥩',nombre:'Pulpa taquera',cat:'carnes',unidad:'kg'},
-  {id:'carne-molida',icon:'🥩',nombre:'Carne molida',cat:'carnes',unidad:'kg'},
-  {id:'hamburguesa',icon:'🍔',nombre:'Carne para hamburguesas',cat:'carnes',unidad:'kg'},
-  {id:'pollo-deshebrado',icon:'🍗',nombre:'Carne deshebrada de pollo',cat:'carnes',unidad:'kg'},
-  {id:'higado-res',icon:'🫀',nombre:'Hígado de res',cat:'carnes',unidad:'kg'},
-  {id:'menudito-panza',icon:'🥘',nombre:'Menudito de panza',cat:'carnes',unidad:'kg'}
+  {id:'cerdo-deshebrado',icon:'🐖',nombre:'Carne deshebrada de cerdo, 300 g',cat:'prod',unidad:'pza'},
+  {id:'pollo-deshebrado',icon:'🍗',nombre:'Pechuga deshebrada de pollo, 300 g',cat:'prod',unidad:'pza'},
+  {id:'menudito-panza',icon:'🥘',nombre:'Menudo de pancita de res, 1 kg',cat:'prod',unidad:'pza'},
+  {id:'pulpa-taquera',icon:'🥩',nombre:'Pulpa taquera (paquete)',cat:'prod',unidad:'pza'},
+  {id:'carne-molida',icon:'🥩',nombre:'Carne molida de res 80%',cat:'prod',unidad:'kg'},
+  {id:'hamburguesa',icon:'🍔',nombre:'Hamburguesas (paquete 8 pzas)',cat:'prod',unidad:'pza'},
+  {id:'higado-res',icon:'🫀',nombre:'Hígado de res',cat:'prod',unidad:'kg'}
 ];
 var skState={},skExtra=[];
 function skLoad(){try{var s=localStorage.getItem('sk_state');if(s)skState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('sk_extra');if(s2)skExtra=JSON.parse(s2);}catch(e){}}
 function skSave(){try{localStorage.setItem('sk_state',JSON.stringify(skState));}catch(e){}}
 function skSaveExtra(){try{localStorage.setItem('sk_extra',JSON.stringify(skExtra));}catch(e){}}
-function skGetState(id){return skState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'kg',precio:'',proveedor:'',nota:''};}
+function skGetState(id){return skState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
 function skAllProducts(){return SK_PRODUCTOS.concat(skExtra);}
 function skSwitchTab(name,btn){
   document.querySelectorAll('#app-sk .panel').forEach(function(p){p.classList.remove('active');});
@@ -1123,10 +1391,10 @@ function skSwitchTab(name,btn){
 }
 function skRenderStock(){
   var list=document.getElementById('sk-stock-list');
-  list.innerHTML='<div class="section-label">🥩 Carnes</div>'+
+  list.innerHTML='<div class="section-label">🥩 Productos</div>'+
     SK_PRODUCTOS.map(function(p){return buildCard(p,skGetState,'sk',false);}).join('')+
     skExtra.map(function(p){return buildCard(p,skGetState,'sk',true);}).join('')+
-    '<div class="add-row"><input class="add-input" id="sk-add-carnes" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')skAddProd()"><button class="btn-add" onclick="skAddProd()">+</button></div>';
+    '<div class="add-row"><input class="add-input" id="sk-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')skAddProd()"><button class="btn-add" onclick="skAddProd()">+</button></div>';
   skUpdateStats();
 }
 function skToggleCard(id){if(!skState[id])skState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};skState[id]._open=!skState[id]._open;skSave();var card=document.getElementById('pc-sk-'+id);if(card)card.classList.toggle('open');}
@@ -1138,21 +1406,193 @@ function skUpdateStats(){
   document.getElementById('sk-st-total').textContent=all.length;document.getElementById('sk-st-ok').textContent=ok;document.getElementById('sk-st-needs').textContent=needs;document.getElementById('sk-st-agot').textContent=agot;
   var badge=document.getElementById('sk-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
 }
-function skAddProd(){var input=document.getElementById('sk-add-carnes');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();skExtra.push({id:id,icon:'🥩',nombre:nombre,cat:'carnes',unidad:'kg'});skSaveExtra();input.value='';skRenderStock();}
+function skAddProd(){var input=document.getElementById('sk-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();skExtra.push({id:id,icon:'🥩',nombre:nombre,cat:'prod',unidad:'kg'});skSaveExtra();input.value='';skRenderStock();}
 function skDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;skExtra=skExtra.filter(function(p){return p.id!==id;});delete skState[id];skSaveExtra();skSave();skRenderStock();}
-function skShareWA(){shareWA('🥩 LISTA SU-KARNE — CENTRAL DE ABASTOS',skAllProducts,skGetState);}
-function skResetAll(){if(confirm('¿Limpiar el estado de SU-KARNE?')){skState={};skSave();skRenderStock();}}
+function skShareWA(){shareWA('🥩 PEDIDO SU CARNE',skAllProducts,skGetState);}
+function skResetAll(){if(confirm('¿Limpiar el estado de SU CARNE?')){skState={};skSave();skRenderStock();}}
+
+
+// SOLES
+var SO_PRODUCTOS = [
+  {id:'tilapia',icon:'🐟',nombre:'Tilapia',cat:'prod',unidad:'kg'},
+  {id:'pechuga',icon:'🍗',nombre:'Pechuga de pollo',cat:'prod',unidad:'kg'}
+];
+var soState={},soExtra=[];
+function soLoad(){try{var s=localStorage.getItem('so_state');if(s)soState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('so_extra');if(s2)soExtra=JSON.parse(s2);}catch(e){}}
+function soSave(){try{localStorage.setItem('so_state',JSON.stringify(soState));}catch(e){}}
+function soSaveExtra(){try{localStorage.setItem('so_extra',JSON.stringify(soExtra));}catch(e){}}
+function soGetState(id){return soState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
+function soAllProducts(){return SO_PRODUCTOS.concat(soExtra);}
+function soSwitchTab(name,btn){
+  document.querySelectorAll('#app-so .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-so .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('so-tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='compra')renderCompra('so-compra-list',soAllProducts,soGetState,'so'); else soRenderStock();
+}
+function soRenderStock(){
+  var list=document.getElementById('so-stock-list');
+  list.innerHTML='<div class="section-label">🐟 Productos</div>'+
+    SO_PRODUCTOS.map(function(p){return buildCard(p,soGetState,'so',false);}).join('')+
+    soExtra.map(function(p){return buildCard(p,soGetState,'so',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="so-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')soAddProd()"><button class="btn-add" onclick="soAddProd()">+</button></div>';
+  soUpdateStats();
+}
+function soToggleCard(id){if(!soState[id])soState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};soState[id]._open=!soState[id]._open;soSave();var card=document.getElementById('pc-so-'+id);if(card)card.classList.toggle('open');}
+function soSetField(id,field,val){if(!soState[id])soState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};soState[id][field]=val;soSave();soUpdateStats();}
+function soSetStatus(id,status){if(!soState[id])soState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};soState[id].status=status;soState[id]._open=true;soSave();setStatusCard('pc-so-'+id,status);soUpdateStats();}
+function soUpdateStats(){
+  var all=soAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=soGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('so-st-total').textContent=all.length;document.getElementById('so-st-ok').textContent=ok;document.getElementById('so-st-needs').textContent=needs;document.getElementById('so-st-agot').textContent=agot;
+  var badge=document.getElementById('so-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+}
+function soAddProd(){var input=document.getElementById('so-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();soExtra.push({id:id,icon:'🐟',nombre:nombre,cat:'prod',unidad:'kg'});soSaveExtra();input.value='';soRenderStock();}
+function soDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;soExtra=soExtra.filter(function(p){return p.id!==id;});delete soState[id];soSaveExtra();soSave();soRenderStock();}
+function soShareWA(){shareWA('🐟 PEDIDO SOLES',soAllProducts,soGetState);}
+function soResetAll(){if(confirm('¿Limpiar el estado de SOLES?')){soState={};soSave();soRenderStock();}}
+
+
+// FOOD
+var EF_PRODUCTOS = [
+  {id:'papas-sazonadas',icon:'🍟',nombre:'Papas sazonadas',cat:'prod',unidad:'kg'},
+  {id:'papa-francesa',icon:'🍟',nombre:'Papa francesa',cat:'prod',unidad:'kg'},
+  {id:'chuleta-natural',icon:'🥩',nombre:'Chuleta natural',cat:'prod',unidad:'kg'},
+  {id:'chuleta-ahumada',icon:'🥓',nombre:'Chuleta ahumada',cat:'prod',unidad:'kg'},
+  {id:'nuggets',icon:'🍗',nombre:'Nuggets',cat:'prod',unidad:'kg'},
+  {id:'boneless-natural',icon:'🍗',nombre:'Boneless naturales',cat:'prod',unidad:'kg'},
+  {id:'boneless-bufalo',icon:'🌶️',nombre:'Boneless de búfalo',cat:'prod',unidad:'kg'},
+  {id:'pollo-tender',icon:'🍗',nombre:'Pollo tender',cat:'prod',unidad:'kg'}
+];
+var efState={},efExtra=[];
+function efLoad(){try{var s=localStorage.getItem('ef_state');if(s)efState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('ef_extra');if(s2)efExtra=JSON.parse(s2);}catch(e){}}
+function efSave(){try{localStorage.setItem('ef_state',JSON.stringify(efState));}catch(e){}}
+function efSaveExtra(){try{localStorage.setItem('ef_extra',JSON.stringify(efExtra));}catch(e){}}
+function efGetState(id){return efState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
+function efAllProducts(){return EF_PRODUCTOS.concat(efExtra);}
+function efSwitchTab(name,btn){
+  document.querySelectorAll('#app-ef .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-ef .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('ef-tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='compra')renderCompra('ef-compra-list',efAllProducts,efGetState,'ef'); else efRenderStock();
+}
+function efRenderStock(){
+  var list=document.getElementById('ef-stock-list');
+  list.innerHTML='<div class="section-label">🍟 Productos</div>'+
+    EF_PRODUCTOS.map(function(p){return buildCard(p,efGetState,'ef',false);}).join('')+
+    efExtra.map(function(p){return buildCard(p,efGetState,'ef',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="ef-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')efAddProd()"><button class="btn-add" onclick="efAddProd()">+</button></div>';
+  efUpdateStats();
+}
+function efToggleCard(id){if(!efState[id])efState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};efState[id]._open=!efState[id]._open;efSave();var card=document.getElementById('pc-ef-'+id);if(card)card.classList.toggle('open');}
+function efSetField(id,field,val){if(!efState[id])efState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};efState[id][field]=val;efSave();efUpdateStats();}
+function efSetStatus(id,status){if(!efState[id])efState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};efState[id].status=status;efState[id]._open=true;efSave();setStatusCard('pc-ef-'+id,status);efUpdateStats();}
+function efUpdateStats(){
+  var all=efAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=efGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('ef-st-total').textContent=all.length;document.getElementById('ef-st-ok').textContent=ok;document.getElementById('ef-st-needs').textContent=needs;document.getElementById('ef-st-agot').textContent=agot;
+  var badge=document.getElementById('ef-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+}
+function efAddProd(){var input=document.getElementById('ef-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();efExtra.push({id:id,icon:'🍟',nombre:nombre,cat:'prod',unidad:'kg'});efSaveExtra();input.value='';efRenderStock();}
+function efDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;efExtra=efExtra.filter(function(p){return p.id!==id;});delete efState[id];efSaveExtra();efSave();efRenderStock();}
+function efShareWA(){shareWA('🍟 PEDIDO FOOD',efAllProducts,efGetState);}
+function efResetAll(){if(confirm('¿Limpiar el estado de FOOD?')){efState={};efSave();efRenderStock();}}
+
+
+// CARNE MART
+var CM_PRODUCTOS = [
+  {id:'pastor',icon:'🌮',nombre:'Carne de cerdo al pastor',cat:'prod',unidad:'kg'},
+  {id:'pepperoni',icon:'🍕',nombre:'Pepperoni',cat:'prod',unidad:'kg'},
+  {id:'salchicha-california',icon:'🌭',nombre:'Salchicha California',cat:'prod',unidad:'kg'},
+  {id:'pierna-puerco',icon:'🍖',nombre:'Pierna de puerco',cat:'prod',unidad:'kg'},
+  {id:'costilla-puerco',icon:'🍖',nombre:'Costilla de puerco',cat:'prod',unidad:'kg'}
+];
+var cmState={},cmExtra=[];
+function cmLoad(){try{var s=localStorage.getItem('cm_state');if(s)cmState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('cm_extra');if(s2)cmExtra=JSON.parse(s2);}catch(e){}}
+function cmSave(){try{localStorage.setItem('cm_state',JSON.stringify(cmState));}catch(e){}}
+function cmSaveExtra(){try{localStorage.setItem('cm_extra',JSON.stringify(cmExtra));}catch(e){}}
+function cmGetState(id){return cmState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
+function cmAllProducts(){return CM_PRODUCTOS.concat(cmExtra);}
+function cmSwitchTab(name,btn){
+  document.querySelectorAll('#app-cm .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-cm .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('cm-tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='compra')renderCompra('cm-compra-list',cmAllProducts,cmGetState,'cm'); else cmRenderStock();
+}
+function cmRenderStock(){
+  var list=document.getElementById('cm-stock-list');
+  list.innerHTML='<div class="section-label">🐷 Productos</div>'+
+    CM_PRODUCTOS.map(function(p){return buildCard(p,cmGetState,'cm',false);}).join('')+
+    cmExtra.map(function(p){return buildCard(p,cmGetState,'cm',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="cm-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')cmAddProd()"><button class="btn-add" onclick="cmAddProd()">+</button></div>';
+  cmUpdateStats();
+}
+function cmToggleCard(id){if(!cmState[id])cmState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};cmState[id]._open=!cmState[id]._open;cmSave();var card=document.getElementById('pc-cm-'+id);if(card)card.classList.toggle('open');}
+function cmSetField(id,field,val){if(!cmState[id])cmState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};cmState[id][field]=val;cmSave();cmUpdateStats();}
+function cmSetStatus(id,status){if(!cmState[id])cmState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};cmState[id].status=status;cmState[id]._open=true;cmSave();setStatusCard('pc-cm-'+id,status);cmUpdateStats();}
+function cmUpdateStats(){
+  var all=cmAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=cmGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('cm-st-total').textContent=all.length;document.getElementById('cm-st-ok').textContent=ok;document.getElementById('cm-st-needs').textContent=needs;document.getElementById('cm-st-agot').textContent=agot;
+  var badge=document.getElementById('cm-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+}
+function cmAddProd(){var input=document.getElementById('cm-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();cmExtra.push({id:id,icon:'🐷',nombre:nombre,cat:'prod',unidad:'kg'});cmSaveExtra();input.value='';cmRenderStock();}
+function cmDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;cmExtra=cmExtra.filter(function(p){return p.id!==id;});delete cmState[id];cmSaveExtra();cmSave();cmRenderStock();}
+function cmShareWA(){shareWA('🐷 PEDIDO CARNE MART',cmAllProducts,cmGetState);}
+function cmResetAll(){if(confirm('¿Limpiar el estado de CARNE MART?')){cmState={};cmSave();cmRenderStock();}}
+
+
+// PROVEEDOR EXTERNO
+var PX_PRODUCTOS = [
+  {id:'manteca-puerco',icon:'🫙',nombre:'Manteca de puerco',cat:'prod',unidad:'kg'}
+];
+var pxState={},pxExtra=[];
+function pxLoad(){try{var s=localStorage.getItem('px_state');if(s)pxState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('px_extra');if(s2)pxExtra=JSON.parse(s2);}catch(e){}}
+function pxSave(){try{localStorage.setItem('px_state',JSON.stringify(pxState));}catch(e){}}
+function pxSaveExtra(){try{localStorage.setItem('px_extra',JSON.stringify(pxExtra));}catch(e){}}
+function pxGetState(id){return pxState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
+function pxAllProducts(){return PX_PRODUCTOS.concat(pxExtra);}
+function pxSwitchTab(name,btn){
+  document.querySelectorAll('#app-px .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-px .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('px-tab-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(name==='compra')renderCompra('px-compra-list',pxAllProducts,pxGetState,'px'); else pxRenderStock();
+}
+function pxRenderStock(){
+  var list=document.getElementById('px-stock-list');
+  list.innerHTML='<div class="section-label">📦 Productos</div>'+
+    PX_PRODUCTOS.map(function(p){return buildCard(p,pxGetState,'px',false);}).join('')+
+    pxExtra.map(function(p){return buildCard(p,pxGetState,'px',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="px-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')pxAddProd()"><button class="btn-add" onclick="pxAddProd()">+</button></div>';
+  pxUpdateStats();
+}
+function pxToggleCard(id){if(!pxState[id])pxState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};pxState[id]._open=!pxState[id]._open;pxSave();var card=document.getElementById('pc-px-'+id);if(card)card.classList.toggle('open');}
+function pxSetField(id,field,val){if(!pxState[id])pxState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};pxState[id][field]=val;pxSave();pxUpdateStats();}
+function pxSetStatus(id,status){if(!pxState[id])pxState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};pxState[id].status=status;pxState[id]._open=true;pxSave();setStatusCard('pc-px-'+id,status);pxUpdateStats();}
+function pxUpdateStats(){
+  var all=pxAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=pxGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('px-st-total').textContent=all.length;document.getElementById('px-st-ok').textContent=ok;document.getElementById('px-st-needs').textContent=needs;document.getElementById('px-st-agot').textContent=agot;
+  var badge=document.getElementById('px-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+}
+function pxAddProd(){var input=document.getElementById('px-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();pxExtra.push({id:id,icon:'📦',nombre:nombre,cat:'prod',unidad:'kg'});pxSaveExtra();input.value='';pxRenderStock();}
+function pxDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;pxExtra=pxExtra.filter(function(p){return p.id!==id;});delete pxState[id];pxSaveExtra();pxSave();pxRenderStock();}
+function pxShareWA(){shareWA('📦 PEDIDO PROVEEDOR EXTERNO',pxAllProducts,pxGetState);}
+function pxResetAll(){if(confirm('¿Limpiar el estado de PROVEEDOR EXTERNO?')){pxState={};pxSave();pxRenderStock();}}
+
 
 // PIÑALITO
 var PN_PRODUCTOS = [
-  {id:'mantequilla-primavera',icon:'🧈',nombre:'Mantequilla Primavera',cat:'lacteos',unidad:'pza'},
-  {id:'queso-le-castell',icon:'🧀',nombre:'Quesos Le Castell',cat:'lacteos',unidad:'pza'}
+  {id:'mantequilla-primavera',icon:'🧈',nombre:'Mantequilla Primavera',cat:'prod',unidad:'pza'}
 ];
 var pnState={},pnExtra=[];
 function pnLoad(){try{var s=localStorage.getItem('pn_state');if(s)pnState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('pn_extra');if(s2)pnExtra=JSON.parse(s2);}catch(e){}}
 function pnSave(){try{localStorage.setItem('pn_state',JSON.stringify(pnState));}catch(e){}}
 function pnSaveExtra(){try{localStorage.setItem('pn_extra',JSON.stringify(pnExtra));}catch(e){}}
-function pnGetState(id){return pnState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'pza',precio:'',proveedor:'',nota:''};}
+function pnGetState(id){return pnState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
 function pnAllProducts(){return PN_PRODUCTOS.concat(pnExtra);}
 function pnSwitchTab(name,btn){
   document.querySelectorAll('#app-pn .panel').forEach(function(p){p.classList.remove('active');});
@@ -1163,10 +1603,10 @@ function pnSwitchTab(name,btn){
 }
 function pnRenderStock(){
   var list=document.getElementById('pn-stock-list');
-  list.innerHTML='<div class="section-label">🧀 Lácteos y Derivados</div>'+
+  list.innerHTML='<div class="section-label">🧈 Productos</div>'+
     PN_PRODUCTOS.map(function(p){return buildCard(p,pnGetState,'pn',false);}).join('')+
     pnExtra.map(function(p){return buildCard(p,pnGetState,'pn',true);}).join('')+
-    '<div class="add-row"><input class="add-input" id="pn-add-lacteos" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')pnAddProd()"><button class="btn-add" onclick="pnAddProd()">+</button></div>';
+    '<div class="add-row"><input class="add-input" id="pn-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')pnAddProd()"><button class="btn-add" onclick="pnAddProd()">+</button></div>';
   pnUpdateStats();
 }
 function pnToggleCard(id){if(!pnState[id])pnState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};pnState[id]._open=!pnState[id]._open;pnSave();var card=document.getElementById('pc-pn-'+id);if(card)card.classList.toggle('open');}
@@ -1178,138 +1618,67 @@ function pnUpdateStats(){
   document.getElementById('pn-st-total').textContent=all.length;document.getElementById('pn-st-ok').textContent=ok;document.getElementById('pn-st-needs').textContent=needs;document.getElementById('pn-st-agot').textContent=agot;
   var badge=document.getElementById('pn-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
 }
-function pnAddProd(){var input=document.getElementById('pn-add-lacteos');var nombre=input.value.trim();if(!nombre)return;var id='pnx-'+Date.now();pnExtra.push({id:id,icon:'🧀',nombre:nombre,cat:'lacteos',unidad:'pza'});pnSaveExtra();input.value='';pnRenderStock();}
+function pnAddProd(){var input=document.getElementById('pn-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();pnExtra.push({id:id,icon:'🧈',nombre:nombre,cat:'prod',unidad:'kg'});pnSaveExtra();input.value='';pnRenderStock();}
 function pnDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;pnExtra=pnExtra.filter(function(p){return p.id!==id;});delete pnState[id];pnSaveExtra();pnSave();pnRenderStock();}
-function pnShareWA(){shareWA('🧀 LISTA PIÑALITO — CENTRAL DE ABASTOS',pnAllProducts,pnGetState);}
-function pnResetAll(){if(confirm('¿Limpiar el estado de Piñalito?')){pnState={};pnSave();pnRenderStock();}}
+function pnShareWA(){shareWA('🧈 PEDIDO PIÑALITO',pnAllProducts,pnGetState);}
+function pnResetAll(){if(confirm('¿Limpiar el estado de PIÑALITO?')){pnState={};pnSave();pnRenderStock();}}
 
-// CARNES CONGELADAS
-var CC_PRODUCTOS = [
-  {id:'cc-pechuga',icon:'🍗',nombre:'Pechuga de pollo',cat:'congelados',unidad:'kg'},
-  {id:'cc-piernil',icon:'🍗',nombre:'Piernil',cat:'congelados',unidad:'kg'},
-  {id:'cc-costilla-res',icon:'🦴',nombre:'Costilla de res',cat:'congelados',unidad:'kg'},
-  {id:'cc-pierna-puerco',icon:'🥩',nombre:'Pierna de puerco',cat:'congelados',unidad:'kg'},
-  {id:'cc-camaron',icon:'🍤',nombre:'Camarón',cat:'congelados',unidad:'kg'},
-  {id:'cc-tilapia',icon:'🐟',nombre:'Tilapia',cat:'congelados',unidad:'kg'},
-  {id:'cc-nuggets',icon:'🍗',nombre:'Nuggets',cat:'congelados',unidad:'kg'},
-  {id:'cc-palomilla',icon:'🥩',nombre:'Palomilla',cat:'congelados',unidad:'kg'},
-  {id:'cc-papas-francesa',icon:'🍟',nombre:'Papas francesa',cat:'congelados',unidad:'kg'},
-  {id:'cc-papas-sazonada',icon:'🍟',nombre:'Papas sazonada',cat:'congelados',unidad:'kg'}
-];
-var ccState={},ccExtra=[];
-function ccLoad(){try{var s=localStorage.getItem('cc_state');if(s)ccState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('cc_extra');if(s2)ccExtra=JSON.parse(s2);}catch(e){}}
-function ccSave(){try{localStorage.setItem('cc_state',JSON.stringify(ccState));}catch(e){}}
-function ccSaveExtra(){try{localStorage.setItem('cc_extra',JSON.stringify(ccExtra));}catch(e){}}
-function ccGetState(id){return ccState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'kg',precio:'',proveedor:'',nota:''};}
-function ccAllProducts(){return CC_PRODUCTOS.concat(ccExtra);}
-function ccSwitchTab(name,btn){
-  document.querySelectorAll('#app-cc .panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('#app-cc .tab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById('cc-tab-'+name).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(name==='compra')renderCompra('cc-compra-list',ccAllProducts,ccGetState,'cc'); else ccRenderStock();
-}
-function ccRenderStock(){
-  var list=document.getElementById('cc-stock-list');
-  list.innerHTML='<div class="section-label">❄️ Congelados</div>'+
-    CC_PRODUCTOS.map(function(p){return buildCard(p,ccGetState,'cc',false);}).join('')+
-    ccExtra.map(function(p){return buildCard(p,ccGetState,'cc',true);}).join('')+
-    '<div class="add-row"><input class="add-input" id="cc-add-congelados" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')ccAddProd()"><button class="btn-add" onclick="ccAddProd()">+</button></div>';
-  ccUpdateStats();
-}
-function ccToggleCard(id){if(!ccState[id])ccState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};ccState[id]._open=!ccState[id]._open;ccSave();var card=document.getElementById('pc-cc-'+id);if(card)card.classList.toggle('open');}
-function ccSetField(id,field,val){if(!ccState[id])ccState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};ccState[id][field]=val;ccSave();ccUpdateStats();}
-function ccSetStatus(id,status){if(!ccState[id])ccState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};ccState[id].status=status;ccState[id]._open=true;ccSave();setStatusCard('pc-cc-'+id,status);ccUpdateStats();}
-function ccUpdateStats(){
-  var all=ccAllProducts();var ok=0,needs=0,agot=0;
-  all.forEach(function(p){var s=ccGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
-  document.getElementById('cc-st-total').textContent=all.length;document.getElementById('cc-st-ok').textContent=ok;document.getElementById('cc-st-needs').textContent=needs;document.getElementById('cc-st-agot').textContent=agot;
-  var badge=document.getElementById('cc-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
-}
-function ccAddProd(){var input=document.getElementById('cc-add-congelados');var nombre=input.value.trim();if(!nombre)return;var id='ccx-'+Date.now();ccExtra.push({id:id,icon:'❄️',nombre:nombre,cat:'congelados',unidad:'kg'});ccSaveExtra();input.value='';ccRenderStock();}
-function ccDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;ccExtra=ccExtra.filter(function(p){return p.id!==id;});delete ccState[id];ccSaveExtra();ccSave();ccRenderStock();}
-function ccShareWA(){shareWA('❄️ LISTA CARNES CONGELADAS — CENTRAL DE ABASTOS',ccAllProducts,ccGetState);}
-function ccResetAll(){if(confirm('¿Limpiar el estado de Carnes Congeladas?')){ccState={};ccSave();ccRenderStock();}}
 
-// GRANOS Y SEMILLAS
-var GS_PRODUCTOS = [
-  {id:'gs-cacahuate-enchilado',icon:'🥜',nombre:'Cacahuate enchilado',cat:'granos',unidad:'kg'},
-  {id:'gs-cacahuate-garapinado',icon:'🥜',nombre:'Cacahuate garapiñado',cat:'granos',unidad:'kg'},
-  {id:'gs-cacahuate-sal',icon:'🥜',nombre:'Cacahuate con sal',cat:'granos',unidad:'kg'},
-  {id:'gs-cacahuate-chipotle',icon:'🥜',nombre:'Cacahuate chipotle',cat:'granos',unidad:'kg'},
-  {id:'gs-cacahuate-natural',icon:'🥜',nombre:'Cacahuate natural',cat:'granos',unidad:'kg'},
-  {id:'gs-mango-enchilado',icon:'🥭',nombre:'Mango enchilado',cat:'granos',unidad:'kg'},
-  {id:'gs-granola',icon:'🥣',nombre:'Granola',cat:'granos',unidad:'kg'},
-  {id:'gs-pistache',icon:'🥜',nombre:'Pistache',cat:'granos',unidad:'kg'},
-  {id:'gs-chia',icon:'🌱',nombre:'Chía',cat:'granos',unidad:'kg'},
-  {id:'gs-uva-pasa',icon:'🍇',nombre:'Uva pasa',cat:'granos',unidad:'kg'},
-  {id:'gs-ciruela-pasa',icon:'🟣',nombre:'Ciruela pasa',cat:'granos',unidad:'kg'},
-  {id:'gs-almendra',icon:'🌰',nombre:'Almendra',cat:'granos',unidad:'kg'},
-  {id:'gs-nuez',icon:'🌰',nombre:'Nuez',cat:'granos',unidad:'kg'},
-  {id:'gs-chilimon',icon:'🌶️',nombre:'Chilimón',cat:'granos',unidad:'kg'},
-  {id:'gs-chile-pasilla',icon:'🌶️',nombre:'Chile pasilla',cat:'granos',unidad:'kg'},
-  {id:'gs-chile-guajillo',icon:'🌶️',nombre:'Chile guajillo',cat:'granos',unidad:'kg'},
-  {id:'gs-chile-arbol',icon:'🌶️',nombre:'Chile de árbol',cat:'granos',unidad:'kg'},
-  {id:'gs-crema-trigo',icon:'🌾',nombre:'Crema de trigo',cat:'granos',unidad:'kg'},
-  {id:'gs-pasta-mini-rueda',icon:'🍝',nombre:'Pasta mini rueda',cat:'granos',unidad:'kg'},
-  {id:'gs-lentejas',icon:'🫘',nombre:'Lentejas',cat:'granos',unidad:'kg'},
-  {id:'gs-garbanzo',icon:'🫘',nombre:'Garbanzo',cat:'granos',unidad:'kg'},
-  {id:'gs-maiz-palomero',icon:'🌽',nombre:'Maíz palomero',cat:'granos',unidad:'kg'},
-  {id:'gs-alpiste',icon:'🌾',nombre:'Alpiste',cat:'granos',unidad:'kg'},
-  {id:'gs-soya',icon:'🌱',nombre:'Soya',cat:'granos',unidad:'kg'},
-  {id:'gs-semilla-girasol',icon:'🌻',nombre:'Semilla de girasol',cat:'granos',unidad:'kg'},
-  {id:'gs-arroz-paisa',icon:'🍚',nombre:'Arroz paisa',cat:'granos',unidad:'kg'},
-  {id:'gs-frijol-pinto',icon:'🫘',nombre:'Frijol pinto',cat:'granos',unidad:'kg'},
-  {id:'gs-frijol-mayocoba',icon:'🫘',nombre:'Frijol mayocoba',cat:'granos',unidad:'kg'},
-  {id:'gs-azucar',icon:'🧂',nombre:'Azúcar',cat:'granos',unidad:'kg'},
-  {id:'gs-piloncillo',icon:'🟤',nombre:'Piloncillo',cat:'granos',unidad:'kg'},
-  {id:'gs-horchata',icon:'🥛',nombre:'Horchata',cat:'granos',unidad:'kg'},
-  {id:'gs-cebada',icon:'🌾',nombre:'Cebada',cat:'granos',unidad:'kg'}
+// CREMERÍA CEVES
+var CV_PRODUCTOS = [
+  {id:'queso-fresco',icon:'🧀',nombre:'Queso fresco',cat:'prod',unidad:'kg'},
+  {id:'queso-panela',icon:'🧀',nombre:'Queso panela',cat:'prod',unidad:'kg'},
+  {id:'panela-chiltepin',icon:'🌶️',nombre:'Queso panela con chiltepín',cat:'prod',unidad:'kg'},
+  {id:'asadero-chiltepin',icon:'🌶️',nombre:'Queso asadero con chiltepín',cat:'prod',unidad:'kg'}
 ];
-var gsState={},gsExtra=[];
-function gsLoad(){try{var s=localStorage.getItem('gs_state');if(s)gsState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('gs_extra');if(s2)gsExtra=JSON.parse(s2);}catch(e){}}
-function gsSave(){try{localStorage.setItem('gs_state',JSON.stringify(gsState));}catch(e){}}
-function gsSaveExtra(){try{localStorage.setItem('gs_extra',JSON.stringify(gsExtra));}catch(e){}}
-function gsGetState(id){return gsState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'kg',precio:'',proveedor:'',nota:''};}
-function gsAllProducts(){return GS_PRODUCTOS.concat(gsExtra);}
-function gsSwitchTab(name,btn){
-  document.querySelectorAll('#app-gs .panel').forEach(function(p){p.classList.remove('active');});
-  document.querySelectorAll('#app-gs .tab').forEach(function(t){t.classList.remove('active');});
-  document.getElementById('gs-tab-'+name).classList.add('active');
+var cvState={},cvExtra=[];
+function cvLoad(){try{var s=localStorage.getItem('cv_state');if(s)cvState=JSON.parse(s);}catch(e){}try{var s2=localStorage.getItem('cv_extra');if(s2)cvExtra=JSON.parse(s2);}catch(e){}}
+function cvSave(){try{localStorage.setItem('cv_state',JSON.stringify(cvState));}catch(e){}}
+function cvSaveExtra(){try{localStorage.setItem('cv_extra',JSON.stringify(cvExtra));}catch(e){}}
+function cvGetState(id){return cvState[id]||{status:'none',existencia:'',cantidad:'',unidad_compra:'',precio:'',proveedor:'',nota:''};}
+function cvAllProducts(){return CV_PRODUCTOS.concat(cvExtra);}
+function cvSwitchTab(name,btn){
+  document.querySelectorAll('#app-cv .panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('#app-cv .tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('cv-tab-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
-  if(name==='compra')renderCompra('gs-compra-list',gsAllProducts,gsGetState,'gs'); else gsRenderStock();
+  if(name==='compra')renderCompra('cv-compra-list',cvAllProducts,cvGetState,'cv'); else cvRenderStock();
 }
-function gsRenderStock(){
-  var list=document.getElementById('gs-stock-list');
-  list.innerHTML='<div class="section-label">🌾 Granos y Semillas</div>'+
-    GS_PRODUCTOS.map(function(p){return buildCard(p,gsGetState,'gs',false);}).join('')+
-    gsExtra.map(function(p){return buildCard(p,gsGetState,'gs',true);}).join('')+
-    '<div class="add-row"><input class="add-input" id="gs-add-granos" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')gsAddProd()"><button class="btn-add" onclick="gsAddProd()">+</button></div>';
-  gsUpdateStats();
+function cvRenderStock(){
+  var list=document.getElementById('cv-stock-list');
+  list.innerHTML='<div class="section-label">🧀 Productos</div>'+
+    CV_PRODUCTOS.map(function(p){return buildCard(p,cvGetState,'cv',false);}).join('')+
+    cvExtra.map(function(p){return buildCard(p,cvGetState,'cv',true);}).join('')+
+    '<div class="add-row"><input class="add-input" id="cv-add-prod" placeholder="+ Agregar producto..." onkeydown="if(event.key===\'Enter\')cvAddProd()"><button class="btn-add" onclick="cvAddProd()">+</button></div>';
+  cvUpdateStats();
 }
-function gsToggleCard(id){if(!gsState[id])gsState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};gsState[id]._open=!gsState[id]._open;gsSave();var card=document.getElementById('pc-gs-'+id);if(card)card.classList.toggle('open');}
-function gsSetField(id,field,val){if(!gsState[id])gsState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};gsState[id][field]=val;gsSave();gsUpdateStats();}
-function gsSetStatus(id,status){if(!gsState[id])gsState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};gsState[id].status=status;gsState[id]._open=true;gsSave();setStatusCard('pc-gs-'+id,status);gsUpdateStats();}
-function gsUpdateStats(){
-  var all=gsAllProducts();var ok=0,needs=0,agot=0;
-  all.forEach(function(p){var s=gsGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
-  document.getElementById('gs-st-total').textContent=all.length;document.getElementById('gs-st-ok').textContent=ok;document.getElementById('gs-st-needs').textContent=needs;document.getElementById('gs-st-agot').textContent=agot;
-  var badge=document.getElementById('gs-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
+function cvToggleCard(id){if(!cvState[id])cvState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};cvState[id]._open=!cvState[id]._open;cvSave();var card=document.getElementById('pc-cv-'+id);if(card)card.classList.toggle('open');}
+function cvSetField(id,field,val){if(!cvState[id])cvState[id]={status:'none',existencia:'',cantidad:'',precio:'',proveedor:'',nota:''};cvState[id][field]=val;cvSave();cvUpdateStats();}
+function cvSetStatus(id,status){if(!cvState[id])cvState[id]={status:'none',cantidad:'',precio:'',proveedor:'',nota:'',_open:true};cvState[id].status=status;cvState[id]._open=true;cvSave();setStatusCard('pc-cv-'+id,status);cvUpdateStats();}
+function cvUpdateStats(){
+  var all=cvAllProducts();var ok=0,needs=0,agot=0;
+  all.forEach(function(p){var s=cvGetState(p.id).status;if(s==='ok')ok++;else if(s==='needs')needs++;else if(s==='agotado')agot++;});
+  document.getElementById('cv-st-total').textContent=all.length;document.getElementById('cv-st-ok').textContent=ok;document.getElementById('cv-st-needs').textContent=needs;document.getElementById('cv-st-agot').textContent=agot;
+  var badge=document.getElementById('cv-badge-ok');if(needs===0&&agot===0&&ok>0)badge.classList.add('show');else badge.classList.remove('show');
 }
-function gsAddProd(){var input=document.getElementById('gs-add-granos');var nombre=input.value.trim();if(!nombre)return;var id='gsx-'+Date.now();gsExtra.push({id:id,icon:'🌾',nombre:nombre,cat:'granos',unidad:'kg'});gsSaveExtra();input.value='';gsRenderStock();}
-function gsDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;gsExtra=gsExtra.filter(function(p){return p.id!==id;});delete gsState[id];gsSaveExtra();gsSave();gsRenderStock();}
-function gsShareWA(){shareWA('🌾 LISTA GRANOS Y SEMILLAS — CENTRAL DE ABASTOS',gsAllProducts,gsGetState);}
-function gsResetAll(){if(confirm('¿Limpiar el estado de Granos y Semillas?')){gsState={};gsSave();gsRenderStock();}}
+function cvAddProd(){var input=document.getElementById('cv-add-prod');var nombre=input.value.trim();if(!nombre)return;var id='skx-'+Date.now();cvExtra.push({id:id,icon:'🧀',nombre:nombre,cat:'prod',unidad:'kg'});cvSaveExtra();input.value='';cvRenderStock();}
+function cvDeleteProd(id){if(!confirm('¿Eliminar este producto?'))return;cvExtra=cvExtra.filter(function(p){return p.id!==id;});delete cvState[id];cvSaveExtra();cvSave();cvRenderStock();}
+function cvShareWA(){shareWA('🧀 PEDIDO CREMERÍA CEVES',cvAllProducts,cvGetState);}
+function cvResetAll(){if(confirm('¿Limpiar el estado de CREMERÍA CEVES?')){cvState={};cvSave();cvRenderStock();}}
+
 
 // INIT
 var hoy = new Date().toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});
-['fv','sk','pn','cc','gs'].forEach(function(n){ document.getElementById(n+'-fecha').textContent = hoy; });
+['fv','sk','so','ef','cm','px','pn','cv'].forEach(function(n){ document.getElementById(n+'-fecha').textContent = hoy; });
 
 fvLoad(); fvRenderStock();
 skLoad(); skRenderStock();
+soLoad(); soRenderStock();
+efLoad(); efRenderStock();
+cmLoad(); cmRenderStock();
+pxLoad(); pxRenderStock();
 pnLoad(); pnRenderStock();
-ccLoad(); ccRenderStock();
-gsLoad(); gsRenderStock();
+cvLoad(); cvRenderStock();
 </script>
 
 </body>
